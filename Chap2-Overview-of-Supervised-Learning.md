@@ -66,6 +66,7 @@ Figure 2.1 shows a scatterplot of training data on a pair of inputs $X_1$ and $X
 - a mixture of 10 low-variance Gaussian distributions, with individual means themselves distributed as Gaussian. (nonlinear and disjoint is the best.)
 
 
+
 ### **Nearest-Neighbor Methods**
 
 Using the observations in the training set $\mathcal{T}$ closest in input space to $x$ to form $\hat{Y}$. The $k$-nearest neighbor fit for $\hat{Y}$ is defined as follows:
@@ -87,6 +88,7 @@ If we use sum-of-squared errors on the training set as criterion for picking $k$
 For the mixture Scenario 2, it seems that KNN would be more apropriate, while for Gaussian data the decision boundaries of k-nearest neighbors would be unnecessarily noisy.
 
 
+
 ### **From Least Squares to Nearest Neighbors**
 
 - Linear model: decision boundary is very smooth, stable to fit, rely on the assumption that a liear decision boundary is appropriate. **Low variance and potentially high bias**. (scenario 1)
@@ -98,8 +100,6 @@ For the mixture Scenario 2, it seems that KNN would be more apropriate, while fo
   - Local regression fits linear models by locally weighted least squares, rather than fitting constants locally.
   - Linear models fit to a basis expansion of the original inputs allow arbitrarily complex models.
   - Projection pursuit and neural network models consist of sums of non- linearly transformed linear models.
-
-
 
 ## **Statistical Decision Theory**
 
