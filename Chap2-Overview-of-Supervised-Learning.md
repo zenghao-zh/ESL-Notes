@@ -70,7 +70,7 @@ Figure 2.1 shows a scatterplot of training data on a pair of inputs $X_1$ and $X
 ### **Nearest-Neighbor Methods**
 
 Using the observations in the training set $\mathcal{T}$ closest in input space to $x$ to form $\hat{Y}$. The $k$-nearest neighbor fit for $\hat{Y}$ is defined as follows:
-$$
+$$\tag{2.5}
 \hat{Y}(x)=\frac{1}{k} \sum_{x_i\in N_k(x)} y_i,
 $$
 where $N_k(x)$ is the neighborhood of $x$ defined by the $k$ closest points $x_i$ in the training sample. Closeness implies a metric, which for the momoent we assume is Euclidean distance.
@@ -101,8 +101,57 @@ For the mixture Scenario 2, it seems that KNN would be more apropriate, while fo
   - Linear models fit to a basis expansion of the original inputs allow arbitrarily complex models.
   - Projection pursuit and neural network models consist of sums of non- linearly transformed linear models.
 
+**Remark**:
+- Bivariate Gaussian distributions
+- Mixture Gaussian distrbutions 
+
 ## **Statistical Decision Theory**
 
+In this section we develop a small amount of theory that provides a framework for developing models such as those discussed informally so far. We first consider the case of a quantitative output, and place ourselves in the world of random variables and probability spaces.
+
+Let $X\in \mathbb{R}^p$ denote a real valued randan input vector, and $Y\in \mathbb{R}$ a real valued random output variable, with joint distribution $Pr(X,Y)$. We seek a function $f(X)$ for predicting $Y$ given values of the input $X$. This theory requires a *loss function* $L(Y, f(X))$ for penalizing errors in prediction, and by far the most common and convenient is *squared error loss*: $L(Y, f(X))= (Y-f(X))^2$.
+
+This leads us to a criterion for choosing $f$, the expected (squared) prediction error
+$$\tag{2.6}
+\begin{aligned}
+\text{EPE}(f) &= E(Y-f(X))^2\\
+&= \int[y-f(x)]^2Pr(dx,dy).
+\end{aligned}
+$$
+By conditioning on $X$, we can write EPE as
+$$\tag{2.7}
+\text{EPE}(f)=E_X(E_{Y|X}([Y-f(X)]^2|X)),
+$$
+and we see that it suffices to minimize EPE pointwise:
+$$\tag{2.8}
+f(x) = \argmin_cE_{Y|X}([Y-c]^2|X=x)
+$$
+The solution is
+$$\tag{2.9}
+f(x)=E(Y|X=x),
+$$
+the conditional expectation, also known as the *regression* fucntion. Thus the best prediction of $Y$ at any point $X=x$ is the conditional mean, when best is measured by average squared error.
+
+**The nearest-neighbor methods attempt to directly implement this recipe using the training data.** At each point $x$, we might ask for the average of all those $y_i$s with input $x_i=x$. Since there is typically at most one observation at any point $x$, we settle for 
+$$\tag{2.10}
+\hat{f}(x) = \text{Ave}(y_i|x_i\in N_k(x)).
+$$
+Two approximations are happening here:
+- expectation is approximated by averaging over sample data;
+- conditioning at a point is relaxed to conditioning on some region "close" to the target point.
+
+As $N, k\to \infty$ such that $k/N\to 0$, one can show that $\hat{f}(x)\to E(Y|X=x)$. It seems we have a universal approximator? In next Section, we see that as the dimension $p$ gets large, so does the metric size of the k-nearest neighborhood. So settling for nearest neighborhood as a surrogate for conditioning will fail us miserably.
+
+**How does linear regression fit into this framwork?**
+
+One assumes that the regression function $f(x)$ is approximately linear in its arguments:
+$$\tag{2.11}
+f(x)\approx x^T\beta.
+$$
+This is a model-based approach -- we specify a model for the regression function. Plugging this linear model for $f(x)$ into EPE (2.6) and differentiating, we can solve for $\beta$ theoretically:
+$$\tag{2.12}
+\beta = [E(XX^T)]^{-1}E(XY).
+$$
 ## **Local Methods in High Dimensions**
 
 ## 
