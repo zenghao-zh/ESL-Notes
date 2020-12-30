@@ -107,15 +107,15 @@ For the mixture Scenario 2, it seems that KNN would be more apropriate, while fo
 
 ## **Statistical Decision Theory**
 
-In this section we develop a small amount of theory that provides a framework for developing models such as those discussed informally so far. We first consider the case of a quantitative output, and place ourselves in the world of random variables and probability spaces.
+In this section we develop a small amount of theory that provides a framework for developing models such as those discussed informally so far. We first consider **the case of a quantitative output**, and place ourselves in the world of random variables and probability spaces.
 
-Let $X\in \mathbb{R}^p$ denote a real valued randan input vector, and $Y\in \mathbb{R}$ a real valued random output variable, with joint distribution $Pr(X,Y)$. We seek a function $f(X)$ for predicting $Y$ given values of the input $X$. This theory requires a *loss function* $L(Y, f(X))$ for penalizing errors in prediction, and by far the most common and convenient is *squared error loss*: $L(Y, f(X))= (Y-f(X))^2$.
+Let $X\in \mathbb{R}^p$ denote a real valued randan input vector, and $Y\in \mathbb{R}$ a real valued random output variable, with joint distribution $\text{Pr}(X,Y)$. We seek a function $f(X)$ for predicting $Y$ given values of the input $X$. This theory requires a *loss function* $L(Y, f(X))$ for penalizing errors in prediction, and by far the most common and convenient is *squared error loss*: $L(Y, f(X))= (Y-f(X))^2$.
 
 This leads us to a criterion for choosing $f$, the expected (squared) prediction error
 $$\tag{2.6}
 \begin{aligned}
 \text{EPE}(f) &= E(Y-f(X))^2\\
-&= \int[y-f(x)]^2Pr(dx,dy).
+&= \int[y-f(x)]^2\text{Pr}(dx,dy).
 \end{aligned}
 $$
 By conditioning on $X$, we can write EPE as
@@ -148,10 +148,53 @@ One assumes that the regression function $f(x)$ is approximately linear in its a
 $$\tag{2.11}
 f(x)\approx x^T\beta.
 $$
-This is a model-based approach -- we specify a model for the regression function. Plugging this linear model for $f(x)$ into EPE (2.6) and differentiating, we can solve for $\beta$ theoretically:
+This is a model-based approach —— we specify a model for the regression function. Plugging this linear model for $f(x)$ into EPE (2.6) and differentiating, we can solve for $\beta$ theoretically:
 $$\tag{2.12}
 \beta = [E(XX^T)]^{-1}E(XY).
 $$
+The least squares solution (2.4) amounts to replacing the expectation in (2.12) by averages over the training data.
+
+So both k-nearest neighbors and least squares end up approximating conditional expectations by averages. But they differ dramatically in terms of model assumptions:
+- Least squares assumes $f(x)$ is well approximated by a globally linear function.
+- $k$-nearest neighbors assumes $f(x)$ is well approximated by a locally constant function.
+
+The more flexible linear model, for example, additive models 
+$$\tag{2.13}
+f(X)=\sum_{j=1}^p f_j(X_j).
+$$
+This retains the additivity of the linear model, but each coordinate function $f_j$ is arbitrary. It turns out that the optimal estimate for the additive model uses techniques such as $k$-nearest neighbors to approximate univariate conditional expectations simultaneously for each of the coordinate functions. Thus the problems of estimating a conditional expectation in high dimensions are swept away in this case by imposing some (often unrealistic) model assumptions, in this case additivity.
+
+If $L_2$ loss function is replaced with the $L_1:E(|Y-f(X)|)$, the solution is the conditional median 
+$$\tag{2.14}
+\hat{f}(x)=\text{median}(Y|X=x).
+$$
+Its estimates are more robust
+than those for the conditional mean.
+
+**When the output is a categorical variable $G$?**
+
+The same paradigm works here, except we need a different loss function for penalizing prediction errors. An estimate $\hat{G}$ will assume values in $\mathcal{G}$, the set of possible classes. Our loss function can be represented by a $K\times K$ matrix $\mathbf{L}$, where $K=\text{card}(\mathcal{G})$. $\mathbf{L}$ will be zero on the diagonal and nonnegative else where, where $L(k,\ell)$ is the price paid for classifying an observation belonging to class $\mathcal{G}_k$ as $\mathcal{G}_{\ell}$. Most often we use the zero–one loss function, where all misclassifications are charged a single unit. The expected prediction error is 
+$$\tag{2.15}
+\text{EPE} = E[L(G,\hat{G}(X))]=  E_X\bigg(\sum_{k=1}^K L[\mathcal{G}_k, \hat{G}(X)]\text{Pr}(\mathcal{G}_k|X)\bigg),
+$$
+and again it suffices to minimize EPE pointwise:
+$$\tag{2.16}
+\hat{G}(x) = \argmin_{g\in\mathcal{G}} \sum_{k=1}^KL(\mathcal{G}_k, g)\text{Pr}(\mathcal{G}_k|X=x).
+$$
+With the 0–1 loss function this simplifies to
+$$\tag{2.17}
+\hat{G}(x)= \argmin_{g\in\mathcal{G}} [1-\text{Pr}(g|X=x)], 
+$$
+or simply
+$$\tag{2.18}
+\hat{G}(x)=\mathcal{G}_k \quad \text{if } \text{Pr}(\mathcal{G}_k|X=x)=\max_{g\in\mathcal{G}}\text{Pr}(g|X=x).
+$$
+This reasonable solution is known as the *Bayes classifier*. Figure 2.5 shows the Bayes-optimal decision boundary
+for our simulation example. The error rate of the Bayes classifier is called the *Bayes rate*.
+<div align=center>
+<img src="pic/figure2.5.png" width="100%">
+</div>
+
 ## **Local Methods in High Dimensions**
 
 ## 
