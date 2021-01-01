@@ -225,6 +225,50 @@ d(p,N) &= \bigg(1-\frac{1}{2}^{1/N}\bigg)^{1/p}
 $$
 (What's the mean distance to the closest point?)For $N=500, p=10, d(p,N)\approx 0.52,$ more than halfway to the boundary.Hence most data points are closer to the boundary of the sample space than to any other data point. The reason that this presents a problem is that prediction is much more difficult near the edges of the training sample. (**that is, samples are closer to the boundary of the sample space than to other samples, which makes prediction much more difficult.Indeed, near the edges of the training sample **) One must extrapolate from neighboring sample points rather than interpolate between them.
 
-*Example:*
+Another manifestation of the curse is that the sampling density is proportional to $N^{1/p}$, where $p$ is the dimension of the input space and $N$ is the sample size.
+For single input, $N_1=100$; for 10 inputs, $N_{10}=100^{10}$, both of them have the sampling density.
 
- *Assume $n$ data sampled independently with a uniform law on $[−1, 1]^p$. You want to estimate $e^{-\|x\|^2/8}$ in $0$ from your data. You choose as an estimator the observed value in $x_i$,the nearest neighbor of $0$. For $n = 1000$ samples and $p = 10$, the probability that this nearest neighbor is at a distance larger than $\frac{1}{2}$ from $0$ is around $0.99$.*
+*Example: another uniform example*
+
+ *Assume $n$ data sampled independently with a uniform law on $[−1, 1]^p$. You want to estimate $e^{-8\|x\|^2}$ in $0$ from your data. You choose as an estimator the observed value in $x_i$,the nearest neighbor of $0$ (1-NN).* 
+
+ *use MSE to estimate f(0), and bias-variance decomposition $MSE = Var+Bias^2$ to analyse.*
+
+ *In low dimensions and with $N=1000$, the nearest neighbor is very close to 0, and so both the bias and variance are small. As the dimension increases, the nearest neighbor tends to stray further from the target point, and both bias and variance are incurred.*
+
+ *For $N = 1000$ samples and $p = 10$, the probability that this nearest neighbor is at a distance larger than $\frac{1}{2}$ from $0$ is around $0.99$.*
+
+ *Thus as $p$ increases, the estimate tends to be 0 more often than not, and hence the MSE levels off at 1.0, as does the bias, and the variance starts dropping (an artifact of this example).*
+
+ The complexity of functions of many variables can grow exponentially with the dimension, and if we wish to be able to estimate such functions with the same accuracy as function in low dimensions, then we need the size of our training set to grow exponentially as well.
+
+The MSE may be dominated by bias or variance (rely on the specific function).
+
+### Fit least squares to the training data.
+
+Suppose that the relationship $Y$ and $X$ is linear, 
+$$\tag{2.20}
+Y=X^T\beta+\varepsilon,
+$$
+where $\varepsilon\sim N(0,\sigma^2)$. For an arbitrary test point $x_0$, we have 
+$$\tag{2.21}
+\hat{y}_0=x_0^T\hat{\beta} = x_0^T\beta+\sum_{i=1}^N \ell_i(x_0)\varepsilon_i,
+$$
+where $\ell_i(x_0)$ is the $i$th elemnt of $\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}x_0$. Under this model the least squares estimates are unbiased, we find that
+$$\tag{2.22}
+\begin{aligned}
+\text{EPE}(x_0) &= E_{y_0|x_0}E_{\mathcal{T}}(y_0-\hat{y}_0)^2\\
+&= Var(y_0|x_0)+Var_{\mathcal{T}}(\hat{y_0}) + Bias^2(\hat{y}_0)\\
+&=\sigma^2 + E_{\mathcal{T}}x_0^T(\mathbf{X}^T\mathbf{X})^{-1}x_0\sigma^2+0^2.
+\end{aligned}
+$$
+The variance depends on $x_0$. If $N$ is large and $\mathcal{T}$ were selected at random, and assuming $E(X)=0$, then $\mathbf{X}^T\mathbf{X}\to NCov(X)$ and 
+$$\tag{2.23}
+\begin{aligned}
+E_{x_0}\text{EPE}(x_0) &\sim E_{x_0}x_0^TCov(X)^{-1}x_0\sigma^2/N+\sigma^2\\
+&= trace[Cov(X)^{-1}Cov(x_0)]\sigma^2/N+\sigma^2\\
+&=\sigma^2(p/N)+\sigma^2.
+\end{aligned}
+$$
+Here we see that the expected EPE increases linearly as a function of $p$, with slope $\sigma^2/N$. If $N$ is large and/or $\sigma^2$ is small, this growth in variance is negligible.(Exercise 2.5 for technical details in (2.22) and (2.23)).
+
