@@ -196,6 +196,35 @@ for our simulation example. The error rate of the Bayes classifier is called the
 </div>
 
 ## **Local Methods in High Dimensions**
+### Curse of dimensionality
+In high dimensions, we could not approximate the theoretically optimal conditional expectation by $k$-nearest-neighbor averaging with a reasonably large set of training data. This phenomenon is referred to as the *curse of dimensionality*. 
 
-## 
+Consider the nearest-neighbor procedure for inputs uniformly distributed in a $p$-dimensional unit hypercube, as in Figure 2.6. Suppose we send out a hypercubical neighborhood about a target point to capture a fraction $r$ of the observations. Since this corresponds to a fraction $r$ of the unit volume, the expected edge length will be $e_p(r)=r^{1/p}$.
 
+*Example: 10-dimensions*
+
+$$
+e_{10}(0.01)=0.63, \quad e_{10}(0.1)=0.80
+$$
+
+*The entire range for each input is only 1. So to capture 1\% or 10\% of the data to form a local average, we must cover 63\% or 80\% of the range of each input variable. Such neighborhoods are no longer "local".*
+
+Reducing $r$ dramatically does not help much either, since the fewer observations we average, the higher is the variance of our fit.
+
+<div align=center>
+<img src="pic/figure2.6.png" width="100%">
+</div>
+
+### Another consequence: all sample points are close to an edge of the sample.
+
+Consider $N$ data points uniformly distributed in a $p$-dimensional unit ball centered at the origin. Suppose we consider a nearest-neighbor estimate at the origin. The median distrance from the origin to the closest data point is given by the expression
+$$\tag{2.19}
+\begin{aligned}
+d(p,N) &= \bigg(1-\frac{1}{2}^{1/N}\bigg)^{1/p}
+\end{aligned}
+$$
+(What's the mean distance to the closest point?)For $N=500, p=10, d(p,N)\approx 0.52,$ more than halfway to the boundary.Hence most data points are closer to the boundary of the sample space than to any other data point. The reason that this presents a problem is that prediction is much more difficult near the edges of the training sample. (**that is, samples are closer to the boundary of the sample space than to other samples, which makes prediction much more difficult.Indeed, near the edges of the training sample **) One must extrapolate from neighboring sample points rather than interpolate between them.
+
+*Example:*
+
+ *Assume $n$ data sampled independently with a uniform law on $[−1, 1]^p$. You want to estimate $e^{-\|x\|^2/8}$ in $0$ from your data. You choose as an estimator the observed value in $x_i$,the nearest neighbor of $0$. For $n = 1000$ samples and $p = 10$, the probability that this nearest neighbor is at a distance larger than $\frac{1}{2}$ from $0$ is around $0.99$.*
