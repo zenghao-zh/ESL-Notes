@@ -57,7 +57,7 @@ and the fitted value at the $i$th input $x_i$ is $\hat{y}_i=x_i^T\hat{\beta}$.
 
 Figure 2.1 shows a scatterplot of training data on a pair of inputs $X_1$ and $X_2$. The two predicted classeds are separated by the *decision boundary* $\{x:x^T\hat{\beta}=0.5\}$.
 <div align=center>
-<img src="pic/figure2.1.png" width="100%">
+<img src="pic/figure2.1.png" width="60%">
 </div>
 
 **Where did the constructed data come from?**
@@ -76,7 +76,7 @@ $$
 where $N_k(x)$ is the neighborhood of $x$ defined by the $k$ closest points $x_i$ in the training sample. Closeness implies a metric, which for the momoent we assume is Euclidean distance.
 
 <div align=center>
-<img src="pic/figure2.2.png" width="100%">
+<img src="pic/figure2.2.png" width="60%">
 </div>
 
 In Figure 2.2, we see that far fewer training observations are misclassified than in Figure 2.1. A little thought suggests that the error on the training data should be approximately an increasing function of $k$, and will always be $0$ for $k=1$.
@@ -192,7 +192,7 @@ $$
 This reasonable solution is known as the *Bayes classifier*. Figure 2.5 shows the Bayes-optimal decision boundary
 for our simulation example. The error rate of the Bayes classifier is called the *Bayes rate*.
 <div align=center>
-<img src="pic/figure2.5.png" width="100%">
+<img src="pic/figure2.5.png" width="60%">
 </div>
 
 ## **Local Methods in High Dimensions**
@@ -212,7 +212,7 @@ $$
 Reducing $r$ dramatically does not help much either, since the fewer observations we average, the higher is the variance of our fit.
 
 <div align=center>
-<img src="pic/figure2.6.png" width="100%">
+<img src="pic/figure2.6.png" width="60%">
 </div>
 
 ### Another consequence: all sample points are close to an edge of the sample.
@@ -257,12 +257,21 @@ $$
 where $\ell_i(x_0)$ is the $i$th elemnt of $\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}x_0$. Under this model the least squares estimates are unbiased, we find that
 $$\tag{2.22}
 \begin{aligned}
-\text{EPE}(x_0) &= E_{y_0|x_0}E_{\mathcal{T}}(y_0-\hat{y}_0)^2\\
-&= Var(y_0|x_0)+Var_{\mathcal{T}}(\hat{y_0}) + Bias^2(\hat{y}_0)\\
+\text{EPE}(x_0)&=E_{y_0|x_0}\big(E_{\mathcal{T}}\big((y_0-\hat{y}_0)^2|y_0\big)\big) \\ 
+&= E_{y_0|x_0}E_{\mathcal{T}}(y_0-\hat{y}_0)^2\\
+&= E_{y_0|x_0}E_{\mathcal{T}}(y_0^2-2y_0\hat{y}_0 +\hat{y}_0^2)\\
+&= E_{y_0|x_0}\big(y_0^2-2y_0E_{\mathcal{T}}(\hat{y}_0)+E_{\mathcal{T}}(\hat{y}_0^2)\big)\\
+&= E_{y_0|x_0}\big(y_0^2-2y_0E_{\mathcal{T}}(\hat{y}_0)+E_{\mathcal{T}}(\hat{y}_0^2)-(E_{\mathcal{T}}\hat{y}_0)^2+ (E_{\mathcal{T}}\hat{y}_0)^2\big)\\
+&= E_{y_0|x_0}(y_0^2)-2E_{y_0|x_0}y_0 E_{\mathcal{T}}(\hat{y}_0)+(E_{\mathcal{T}}\hat{y}_0)^2+Var_{\mathcal{T}}(\hat{y}_0)\\
+&= Var(y_0|x_0) + Var_{\mathcal{T}}(\hat{y}_0)+ ( E_{\mathcal{T}}\hat{y}_0-E_{y_0|x_0}y_0)^2\\
+&= \underline{Var(y_0|x_0)+Var_{\mathcal{T}}(\hat{y}_0) + Bias^2(\hat{y}_0)}\\
+&= Var(y_0|x_0)+Var_{\mathcal{T}}\bigg(\sum_{i=1}^N \ell_i(x_0)\varepsilon_i\bigg) + Bias^2(\hat{y}_0)\\
+& = Var(y_0|x_0)+Var_{\mathcal{T}}(\varepsilon^T\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}x_0) + Bias^2(\hat{y}_0)\\
+&=\sigma^2 + E_{\mathcal{T}}x_0^T(\mathbf{X}^T\mathbf{X})^{-1}x_0\sigma^2 - E_{\mathcal{T}}(\varepsilon^T\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}x_0)+0^2\\
 &=\sigma^2 + E_{\mathcal{T}}x_0^T(\mathbf{X}^T\mathbf{X})^{-1}x_0\sigma^2+0^2.
 \end{aligned}
 $$
-The variance depends on $x_0$. If $N$ is large and $\mathcal{T}$ were selected at random, and assuming $E(X)=0$, then $\mathbf{X}^T\mathbf{X}\to NCov(X)$ and 
+The variance depends on $x_0$. If $N$ is large and $\mathcal{T}$ were selected at random, and assuming $E(X)=0$ (**Standardlization**), then $\mathbf{X}^T\mathbf{X}\to NCov(X)$ and 
 $$\tag{2.23}
 \begin{aligned}
 E_{x_0}\text{EPE}(x_0) &\sim E_{x_0}x_0^TCov(X)^{-1}x_0\sigma^2/N+\sigma^2\\
@@ -272,3 +281,8 @@ E_{x_0}\text{EPE}(x_0) &\sim E_{x_0}x_0^TCov(X)^{-1}x_0\sigma^2/N+\sigma^2\\
 $$
 Here we see that the expected EPE increases linearly as a function of $p$, with slope $\sigma^2/N$. If $N$ is large and/or $\sigma^2$ is small, this growth in variance is negligible.(Exercise 2.5 for technical details in (2.22) and (2.23)).
 
+By relying on rigid assumptions, the linear model has no bias at all and negligible variance, while the error in 1-nearest neighbor is substantially larger. However, if the assumptions are wrong, all bets are off and the 1-nearest neighbor may dominate. We will see that there is a whole spectrum of models between the rigid linear models and the extremely flexible 1-nearest-neighbor models, each with their own assumptions and biases, which have been proposed specifically to avoid the exponential growth in complexity of functions in high dimensions by drawing heavily on these assumptions.
+
+<div align=center>
+<img src="pic/figure2.9.png" width="60%">
+</div>
