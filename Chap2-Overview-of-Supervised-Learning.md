@@ -267,7 +267,7 @@ $$\tag{2.22}
 &= \underline{Var(y_0|x_0)+Var_{\mathcal{T}}(\hat{y}_0) + Bias^2(\hat{y}_0)}\\
 &= Var(y_0|x_0)+Var_{\mathcal{T}}\bigg(\sum_{i=1}^N \ell_i(x_0)\varepsilon_i\bigg) + Bias^2(\hat{y}_0)\\
 & = Var(y_0|x_0)+Var_{\mathcal{T}}(\varepsilon^T\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}x_0) + Bias^2(\hat{y}_0)\\
-&=\sigma^2 + E_{\mathcal{T}}x_0^T(\mathbf{X}^T\mathbf{X})^{-1}x_0\sigma^2 - E_{\mathcal{T}}(\varepsilon^T\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}x_0)+0^2\\
+&=\sigma^2 + E_{\mathcal{T}}x_0^T(\mathbf{X}^T\mathbf{X})^{-1}x_0\sigma^2 - (E_{\mathcal{T}}(\varepsilon^T\mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}x_0))^2+0^2\\
 &=\sigma^2 + E_{\mathcal{T}}x_0^T(\mathbf{X}^T\mathbf{X})^{-1}x_0\sigma^2+0^2.
 \end{aligned}
 $$
@@ -279,10 +279,92 @@ E_{x_0}\text{EPE}(x_0) &\sim E_{x_0}x_0^TCov(X)^{-1}x_0\sigma^2/N+\sigma^2\\
 &=\sigma^2(p/N)+\sigma^2.
 \end{aligned}
 $$
-Here we see that the expected EPE increases linearly as a function of $p$, with slope $\sigma^2/N$. If $N$ is large and/or $\sigma^2$ is small, this growth in variance is negligible.(Exercise 2.5 for technical details in (2.22) and (2.23)).
+Here we see that the expected EPE increases linearly as a function of $p$, with slope $\sigma^2/N$. If $N$ is large and/or $\sigma^2$ is small, this growth in variance is negligible.By imposing some heavyrestrictions on the class of models being fitted, we have avoided the curse of dimensionality.(Exercise 2.5 for technical details in (2.22) and (2.23)).
 
 By relying on rigid assumptions, the linear model has no bias at all and negligible variance, while the error in 1-nearest neighbor is substantially larger. However, if the assumptions are wrong, all bets are off and the 1-nearest neighbor may dominate. We will see that there is a whole spectrum of models between the rigid linear models and the extremely flexible 1-nearest-neighbor models, each with their own assumptions and biases, which have been proposed specifically to avoid the exponential growth in complexity of functions in high dimensions by drawing heavily on these assumptions.
 
 <div align=center>
 <img src="pic/figure2.9.png" width="60%">
 </div>
+
+## **Statistical Models, Supervised Learning and Function Approximation**
+
+Our goal is to find an approximation $\hat{f}(x)$ to the function $f(x)$.
+
+In Section 2.4, the squared error loss lead to $f(x)=E(Y|X=x)$ for a quantitative response. The KNN can be viewed as direct estimates of this conditional expectation, but they can fail in at least two ways:
+- if the dimension of the input space is high, the nearest neighbors need not be close to the target point, and can result in large errors;
+- if special structure is known to exist, this can be used to reduce both the bias and the variance of the estimates.
+
+### A Statistical Model for the Joint Distribution $\text{Pr}(X,Y)$
+Suppose in fact that our data arose from a statistical model
+$$\tag{2.24}
+Y=f(X)+\varepsilon, 
+$$
+where the random error $\varepsilon$ has $E(\varepsilon) = 0$ and is independent of $X$. Note that for $f(x)=E(Y|X=x)$, the conditional distribution $\text{Pr}(Y|X)$ depends on $X$ only through the conditional mean $f(x)$. The additifve model assumes that all departures error can be captured via the error $\varepsilon$.
+
+Additive error models are typically not used for qualitative outputs $G$; in this case the target function $p(X)$ is the conditional density $\text{Pr}(G|X)$, and this is modeled directly. But we will see that they can be handled by techniques appropriate for the error-based models. If $Y$ is the 0–1 coded version of $G$, then $E(Y |X = x) = p(x)$, but the variance depends on $x$ as well: $Var(Y |X = x) = p(x)[1 − p(x)]$.
+
+The assumption in (2.24) that the errors are independent and identically distributed is not strictly necessary. Simple modifications can be made to avoid the independence assumption; for example, we can have $Var(Y |X = x) =\sigma(x)$, and now both the mean and variance depend on $X$.
+
+
+### Function Approximation
+
+The approach taken in applied mathematics and statistics has been from the perspective of function approximation and estimation. Here the data pairs $\{x_i,y_i\}$ are viewed as points in a $(p+1)$-dimensional Euclidean space (although in general the inputs can be of mixed type). 
+- Function-fitting paradigm: learn $f$ by example through fedding a observed input values into a learning algorithm, which produces outputs $\hat{f}(x_i)$ in response to the inputs.
+- Geometrical paradigm: The goal is to obtain a useful approximation to $f(x)$ for all $x$ in some region of $\mathbb{R}^p$, given the representations in $\mathcal{T}$.
+
+linear basis expansisons:
+$$\tag{2.25}
+f_{\theta}(x)=\sum_{k=1}^Kh_k(x)\theta_K,
+$$
+where $h_k$ are a suitable set of functions or transformations of the input vector $x$. For example, $x_1^2, x_1x_2^2, \cos(x_1),$ sigmoid and so on.
+
+We can use least squares to estimate the parameters $\theta$ in $f_{\tehta}$, by minimizing the residual sum-of-squares (as we did for the linear model)
+$$\tag{2.26}
+\text{RSS}(\theta) =\sum_{i=1}^N(y_i-f_{\theta}(x_i))^2
+$$
+as a function of $\theta$. In terms of function approximation, we imagine our parameterized function as a surface in $p + 1$ space, and what we observe are noisy realizations from it.
+
+For the linear model we get a simple closed form solution to the minimization problem. This is also true for the basis function methods, if the basis functions themselves do not have any hidden parameters. Otherwise the solution requires either iterative methods or numerical optimization.
+
+Least squares is not the only criterion used. A more general principle for estimation is *maximum likelihood estimation*. Suppose a random sample $y_i, i=1,...,N$ from a density $\text{Pr}_{\theta}(y)$ indexed by some parameters $\theta$. The log-probability of the observed sample is 
+$$\tag{2.27}
+L(\theta) = \sum_{i=1}^N\log \text{Pr}_{\theta}(y_i).
+$$
+Least squares for the additive error with $\varepsilon\sim N(0,\sigma^2)$ is equivalent to maximum likelihood using the conditional likelihood 
+$$\tag{2.28}
+\text{Pr}(Y|X,\theta) = N(f_{\theta}(X),\sigma^2).
+$$
+So although the additional assumption of normality seems more restrictive,
+the results are the same. The log-likelihood of the data is 
+$$\tag{2.29}
+L(\theta) = -\frac{N}{2}\log(2\pi)-N\log \sigma-\frac{1}{2\sigma^2}\sum_{i=1}^N(y_i-f_{\theta}(x_i))^2.
+$$
+
+A more interesting example is the multinomial likelihood for the regression function $\Pr(G|X)$ for a qualitative output $G$. Suppose we have a model $\Pr(G=\mathcal{G}_k|X=x)=p_{k,\theta}(x), k=1,...,K$ for the conditonal probability of each class given $X$, indexed by the parameter vector $\theta$. Then the log-likelihood (also referred to as the cross-entropy) is 
+
+$$\tag{2.30}
+L(\theta) =\sum_{i=1}^N\log p_{g_i,\theta}(x_i),
+$$
+when maximized it delivers values of $\theta$ that best conform with the data in this likelihood sense.
+
+## Structured Regression Models
+
+KNN and other local methods also be inappropriate even in low dimensions in cases where more structured approaches can make more efficient use of the data.
+
+### Difficulty of the Problem
+
+Consider the RSS criterion for an arbitrary function $f$,
+$$\tag{2.31}
+\text{RSS}(f) = \sum_{i=1}^N(y_i-f(x_i))^2.
+$$
+
+- Minimizing (2.31) leads to infinitely many solutions: any function $\hat{f}$ passing through the training points $(x_i, y_i)$ is a solution. 
+- (2.31) is a finite sample of (2.7). If the sample size $N$ were sufficiently large such that repeats were guaranteed and densely arranged, it would seem that these solutions might all tend to the limiting conditional expectation.
+- In order to obtain useful results for finite $N$ , we must restrict the eligible solutions to (2.31) to a smaller set of functions. These restrictions are sometimes encoded via the parametric representation of $f(\theta)$, or may be built into the learning method itself, either implicitly or explicitly. 
+- There are infinitely many possible restrictions, each leading to a unique solution, so the ambiguity has simply been transferred to the choice of constraint.
+- In general the constraints imposed by most learning methods can be described as *complexity* restrictions of one kind or another. This usually means some kind of regular behavior in small neighborhoods of the input space. That is, for all input points $x$ sufficiently close to each other in some metric, $\hat{f}$ exhibits some special structure such as nearly constant, linear or low-order polynomial behavior.
+- The strength of the constraint is dictated by the neighborhood size. The larger the size of the neighborhood, the stronger the constraint, and the more sensitive the solution is to the particular choice of constraint.
+- The nature of the constraint depends on the metric used. Different methods have different assumptions.
+
+**Any method that attempts to produce locally varying functions in small isotropic neighborhoods will run into problems in high dimensions—again the curse of dimensionality. And conversely, all methods that overcome the dimensionality problems have an associated—and often implicit or adaptive—metric for measuring neighborhoods, which basically does not allow the neighborhood to be simultaneously small in all directions.**
