@@ -368,3 +368,35 @@ $$
 - The nature of the constraint depends on the metric used. Different methods have different assumptions.
 
 **Any method that attempts to produce locally varying functions in small isotropic neighborhoods will run into problems in high dimensions—again the curse of dimensionality. And conversely, all methods that overcome the dimensionality problems have an associated—and often implicit or adaptive—metric for measuring neighborhoods, which basically does not allow the neighborhood to be simultaneously small in all directions.**
+
+## Classes of Restricted Estimators
+
+The variety of nonparametric regression techniques or learning methods fall into a number of different classes depending on the nature of the restrictions imposed. These classes are not distinct, and indeed some methods fall in several classes.
+
+- RSS$(f)$ with a roughness penalty
+  - Penalty function, or regularization methods, express our prior belief that the type of functions we seek exhibit a certain type of smooth behavior, and indeed can usually be cast in a Bayesian framework.
+- Kernel methods and local regression
+  - These methods can be thought of as explicitly providing estimates of the regression function or conditional expectation by specifying the nature of the local neighborhood, and of the class of regular functions fitted locally.
+  - Nadaraya-Watson weighted average
+  - K-nearest neighbors
+- Basis functions and dictionary methods
+  - a linear expansion of basis functions
+  - Radial basis functions
+  - Single-layer neural network (be thought of as an adaptive basis function, dictionary mehtod)
+
+## Model Selection and the Bias-Variance Tradeoff
+
+All the models described above and many others discussed in later chapters have a smoothing or complexity parameter that has to be determined:
+- the multiplier of the penalty term;
+- the width of the kernel;
+- or the number of basis functions.
+
+Assuming that $Y=f(X)+\varepsilon$, wieth $E(\varepsilon) = 0$ and $Var(\varepsilon)=\sigma^2$, the expected prediciton error for KNN at $x_0$, also known as test or generalization error can be decomposed
+$$\tag{2.32}
+\begin{aligned}
+\text{EPE}_k(x_0)&= E[(Y-\hat{f}_k(x_0))^2|X=x_0]\\
+&=\sigma^2 + \text{Bias}^2(\hat{f}_k(x_0)+Var_{\mathcal{T}}(\hat{f}_k(x_0))\\
+&=\sigma^2+\bigg[f(x_0)-\frac{1}{k}\sum_{\ell=1}^kf(x_{(\ell)})\bigg]^2+\frac{\sigma^2}{k}.
+\end{aligned}
+$$
+The subscripts in parentheses $(\ell)$ indicate the sequence of nearest neighbors to $x_0$.
