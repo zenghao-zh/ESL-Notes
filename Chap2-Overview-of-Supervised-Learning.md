@@ -275,7 +275,9 @@ The variance depends on $x_0$. If $N$ is large and $\mathcal{T}$ were selected a
 $$\tag{2.23}
 \begin{aligned}
 E_{x_0}\text{EPE}(x_0) &\sim E_{x_0}x_0^TCov(X)^{-1}x_0\sigma^2/N+\sigma^2\\
-&= trace[Cov(X)^{-1}Cov(x_0)]\sigma^2/N+\sigma^2\\
+&= \text{trace}(E_{x_0}x_0x_0^TCov(X)^{-1})\sigma^2/N+\sigma^2\\ 
+&= E_{x_0}x_0^TCov(X)^{-1}x_0\sigma^2/N+\sigma^2\\
+&= \text{trace}[Cov(X)^{-1}Cov(x_0)]\sigma^2/N+\sigma^2\\
 &=\sigma^2(p/N)+\sigma^2.
 \end{aligned}
 $$
