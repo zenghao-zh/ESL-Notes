@@ -397,7 +397,7 @@ Assuming that $Y=f(X)+\varepsilon$, wieth $E(\varepsilon) = 0$ and $Var(\varepsi
 $$\tag{2.32}
 \begin{aligned}
 \text{EPE}_k(x_0)&= E[(Y-\hat{f}_k(x_0))^2|X=x_0]\\
-&=\sigma^2 + \text{Bias}^2(\hat{f}_k(x_0)+Var_{\mathcal{T}}(\hat{f}_k(x_0))\\
+&=\sigma^2 + \text{Bias}^2(\hat{f}_k(x_0))+Var_{\mathcal{T}}(\hat{f}_k(x_0))\\
 &=\sigma^2+\bigg[f(x_0)-\frac{1}{k}\sum_{\ell=1}^kf(x_{(\ell)})\bigg]^2+\frac{\sigma^2}{k}.
 \end{aligned}
 $$
