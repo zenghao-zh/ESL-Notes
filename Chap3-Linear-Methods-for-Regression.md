@@ -314,14 +314,41 @@ arises naturally from multivariate Gaussian theory. Here $f(x)$ is the vector fu
 
 (Exercise 3.11) The solution is given by (3.25); $K$ separate regressions that ignore the correlations. If the $\mathbf{\Sigma}_i$ vary among observations, then the solution for $\mathbf{B}$ no longer decouples. 
 
-> *Proof of Exercise 3.11.*
+  > *Proof of Exercise 3.11.*
 
 (Section 3.7 pursue the multiple outcome problem.)
 
 ## Subset Selection
+**Motivation:** We are oftern not satisfied with the least squares estimates because  of prediction accuracy (low bias but large variance) and interpretation (we would like to determine a smaller subset that exhibit the strongest effects).
+
+The subset selection and controling variance method all fall under the general heading *model selection*. With subset selection we retain only a subset of the variables, and eliminate the rest from the model. 
 
 ### Best-Subset Selection
-### Forward- and Backward-Stepwise Selection
+- **Best subset regression finds for each $k\in\{0, 1, 2, . . . , p\}$ the subset of size $k$ that gives smallest residual sum of squares.** (*leaps and bounds procedure——makes this feasible for $p$ as large as 30 or 40*) 
+- The best-subset curve is necessarily decreasing, so cannot be used to select the subet size $k$.
+- There are a number of criteria that one may use; typically we choose the smallest model that minimizes an estimate of the expected prediction error.
+- AIC criterion and cross-validation (Chapter 7)
+### Forward-Stepwise Selection
+- **Forward-stepwise selection starts with the intercept, and then sequentially adds into the model the predictor that most improves the fit.**
+- Exploit the QR decomposition for the current fit to rapidly establish the next candidate (Exercise 3.9). 
+  > Exercise 3.9
+- Sub-optimal, greedy algorihtm
+- Advantage: Computational (for large $p$), Statistical (lower variance, but more bias.)
+### Backward-Stepwise Selection
+- **Backward-stepwise selection starts with the full model, and sequentially deletes the predictor that has the least impact on the fit.**
+- The candidate for dropping is the variable with the smallest Z-score (Exercise 3.10). 
+  > Exercise 3.10
+- only be used when $N>p$, while forward step wise can always be used.
+
+Software packages implement hybrid stepwise-selection (select best of forward and backward, AIC score). Some traditional packages base the selection on $F$-statistics adding "significant" terms and dropping "non-significant" terms.
+
 ### Forward-Stagewise Regression
+- More constrained than forward-stepwise regression
+- It starts like forward-stepwise regression, with an intercept equal to $\bar{y}$, and centered predictors with coefficients initially all $0$. At each step the algorithm identifies the variable most correlated with the current residual. It then computes the simple linear regression coefficient of the residual on this chosen variable, and then adds it to the current co- efficient for that variable. This is continued till none of the variables have correlation with the residuals—i.e. the least-squares fit when $N > p$.
+- Forrward stagewise can take many more than $p$ steps to reach the least squares fit, and historically has been dismissed as being inefficient.
+- The other variables can be adjusted when a term is added.
+- "Slow fitting" in high-dimensional problems (Section 3.8.1).
 
 *Example: Prostate Cancer (Continued) (Page 61).*
+
+## Shrinkage Methods
