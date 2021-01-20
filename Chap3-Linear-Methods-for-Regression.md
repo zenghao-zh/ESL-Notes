@@ -5,13 +5,13 @@
 
 # **Linear Methods for Regression**
 
-## Linear regression model
+## **Linear regression model**
 - Assuming that the regression function $E(Y|X)$ is linear in the inputs $X_1,...,X_p$.
 - Simple and provide an adequate and interpretable description of how the inputs affect the output.
 - Outperform in small numbers training cases, low signal-to-noise ratio or sparse data.
 - In Chapter 5, basis-funciton methods will be discussed.
 
-## Least squares
+## **Least squares**
 
 Suppose that the regression function $E(Y|X)$ is linear, given input vector $X^T = (X_1, X_2, ..., X_p)$, real-valued output $Y$, the linear regression model has the form
 
@@ -193,7 +193,7 @@ $$
 
 *Example: Prostate Cancer (Page 50).*
 
-## The Gauss-Markov Theorem
+## **The Gauss-Markov Theorem**
 
 **The least squares estimates of the parameters $\beta$ have the smallest variance among all linear unbiased estimates.**
 
@@ -232,7 +232,7 @@ $$
 Therefore, expected prediction error and mean squared error differ only by
 the constant $\sigma^2$.
 
-## Multiple Regression from Simple Univariate Regression
+## **Multiple Regression from Simple Univariate Regression**
 
 The linear model with $p>1$ inputs is called the *multiple linear regression model*. $p=1$ called *univariate* linear model. 
 
@@ -283,7 +283,7 @@ $$
    The precision with wich we can estimate $\hat{\beta}_p$ depends on the length of the residual vector $\mathbf{z}_p$; this represents how mush of $\mathbf{x}_p$ is unexplained by the other $\mathbf{x}_k$'s.
 
 
-## Multiple outputs
+## **Multiple outputs**
 
 Suppose we have multiple ouputs $Y_1, Y_2, ..., Y_K$ that we wish to predict from our inputs $X_0, X_1, X_2, ..., X_p$. We assume a linear model for each output
 $$\tag{3.22}
@@ -306,7 +306,7 @@ Hence the coefficients for the $k$th outcome are just the least squares estimate
 
 If the errors $\varepsilon = (\varepsilon_1,...,\varepsilon_K )$ in (3.22) are correlated, then it might seem appropriate to modify (3.24) in favor of a multivariate version. Specifically, suppose $Cov(\varepsilon) = \mathbf{\Sigma}$, then the multivariate weighted criterion
 
-$$\tag{3.25}
+$$\tag{3.26}
 \text{RSS}(\mathbf{B}) = \sum_{i=1}^N(y_{i}-f(x_i))^T\mathbf{\Sigma}^{-1}(y_{i}-f(x_i))
 $$
 
@@ -318,23 +318,23 @@ arises naturally from multivariate Gaussian theory. Here $f(x)$ is the vector fu
 
 (Section 3.7 pursue the multiple outcome problem.)
 
-## Subset Selection
+## **Subset Selection**
 **Motivation:** We are oftern not satisfied with the least squares estimates because  of prediction accuracy (low bias but large variance) and interpretation (we would like to determine a smaller subset that exhibit the strongest effects).
 
 The subset selection and controling variance method all fall under the general heading *model selection*. With subset selection we retain only a subset of the variables, and eliminate the rest from the model. 
 
-### Best-Subset Selection
+### **Best-Subset Selection**
 - **Best subset regression finds for each $k\in\{0, 1, 2, . . . , p\}$ the subset of size $k$ that gives smallest residual sum of squares.** (*leaps and bounds procedure——makes this feasible for $p$ as large as 30 or 40*) 
 - The best-subset curve is necessarily decreasing, so cannot be used to select the subet size $k$.
 - There are a number of criteria that one may use; typically we choose the smallest model that minimizes an estimate of the expected prediction error.
 - AIC criterion and cross-validation (Chapter 7)
-### Forward-Stepwise Selection
+### **Forward-Stepwise Selection**
 - **Forward-stepwise selection starts with the intercept, and then sequentially adds into the model the predictor that most improves the fit.**
 - Exploit the QR decomposition for the current fit to rapidly establish the next candidate (Exercise 3.9). 
   > Exercise 3.9
 - Sub-optimal, greedy algorihtm
 - Advantage: Computational (for large $p$), Statistical (lower variance, but more bias.)
-### Backward-Stepwise Selection
+### **Backward-Stepwise Selection**
 - **Backward-stepwise selection starts with the full model, and sequentially deletes the predictor that has the least impact on the fit.**
 - The candidate for dropping is the variable with the smallest Z-score (Exercise 3.10). 
   > Exercise 3.10
@@ -342,7 +342,7 @@ The subset selection and controling variance method all fall under the general h
 
 Software packages implement hybrid stepwise-selection (select best of forward and backward, AIC score). Some traditional packages base the selection on $F$-statistics adding "significant" terms and dropping "non-significant" terms.
 
-### Forward-Stagewise Regression
+### **Forward-Stagewise Regression**
 - More constrained than forward-stepwise regression
 - It starts like forward-stepwise regression, with an intercept equal to $\bar{y}$, and centered predictors with coefficients initially all $0$. At each step the algorithm identifies the variable most correlated with the current residual. It then computes the simple linear regression coefficient of the residual on this chosen variable, and then adds it to the current co- efficient for that variable. This is continued till none of the variables have correlation with the residuals—i.e. the least-squares fit when $N > p$.
 - Forrward stagewise can take many more than $p$ steps to reach the least squares fit, and historically has been dismissed as being inefficient.
@@ -351,4 +351,184 @@ Software packages implement hybrid stepwise-selection (select best of forward an
 
 *Example: Prostate Cancer (Continued) (Page 61).*
 
-## Shrinkage Methods
+## **Shrinkage Methods**
+
+Subset selection produces is interpretable and has possibly lower prediction error than the full model. However, it is a discrete process (variables are either retained or discarded-> high variance). Shrinkage methods are more continuous, and don't suffer as much from high variability.
+
+### **Ridge Regression**
+Ridge regression shrinks the regression coefficients by imposing a penalty on their size, 
+$$\tag{3.27}
+\hat{\beta}^{\text{ridge}} = \argmin_{\beta} \bigg\{\sum_{i=1}^N(y_i-\beta_0-\sum_{j=1}^px_{ij}\beta_j)^2+\lambda \sum_{j=1}^p\beta_j^2\bigg\}.
+$$
+Here $\lambda\geq 0$ is a complexity parameter that controls the amount of shrinkage: the larger the value of $\lambda$, the greater the amount of shrinkage. An equivalent way to write the ridge problem is 
+$$\tag{3.28}
+\begin{aligned}
+\hat{\beta}^{\text{ridge}} = \argmin_{\beta} &\sum_{i=1}^N\bigg(y_i-\beta_0-\sum_{j=1}^px_{ij}\beta_j\bigg)^2.\\
+\text{subject to} &\sum_{j=1}^p\beta_j^2 \leq t.
+\end{aligned}$$
+
+- There is a one-to-one correspondence between the parameters $\lambda$ and $t$. 
+- When there are many correlated variables in a linear regression model, their coefficients can become poorly determined and exhibit high variance.
+- The ridge solutions are not equivariant under scaling of the inputs, and so one normally standardizes the inputs before solving (3.27).
+- (Exercise 3.5) The solution to (3.27) can be separated into two parts, after reparametrization using centered inpus. We estimate $\beta_0$ by $\bar{y}$. The remaining coefficients get estimated by a ridge regression without intercept, using the centered $x_{ij}$. Henceforce, onece the centering has been donw, the input matrix $\mathbf{X}$ has $p$ columns.
+
+  The criterion in (3.27) in matrix form, 
+  $$\tag{3.29}
+  \text{RSS}(\lambda) = (\mathbf{y}-\mathbf{X}\beta)^T(\mathbf{y}-\mathbf{X}\beta) + \lambda \beta^T\beta,
+  $$ 
+  the ridge regression solutions are easily seen to be 
+  $$\tag{3.30}
+  \hat{\beta}^{\text{ridge}} = (\mathbf{X}^T\mathbf{X}+\lambda I_p)^{-1}\mathbf{X}^T\mathbf{y},
+  $$
+  The problem is nonsigular since the solution add a positive constant to the disgonal of $\mathbf{X}^T\mathbf{X}$.
+  > Exercise 3.5
+- (Exercise 3.6) Ridge regression can also be derived as the mean or mode of a posterior distribution, with a suitably chosen prior distribution.
+  > Exercise 3.6 (Note: the mode of the posterior distribution is also posterior mean for the normal distribution.)
+
+**SVD Insights**
+
+The SVD of the $N\times p$ matrix $\mathbf{X}$ has the form
+$$\tag{3.31}
+\mathbf{X} = \mathbf{U}\mathbf{D}\mathbf{V}^T.
+$$
+Here $\mathbf{U}$ and $\mathbf{V}$ span the column space and row space of $\mathbf{X}$, respectively. We can write the least fitted vector as 
+$$\tag{3.32}
+\mathbf{X} \hat{\beta}^{\text{ls}} = \mathbf{X}(\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{y}= \mathbf{U}\mathbf{U}^T\mathbf{y}.
+$$
+Note that $\mathbf{U}^T\mathbf{y}$ are the coordinates of $\mathbf{y}$ with respect to the rothonormal basis $\mathbf{U}$. $\mathbf{Q}$ and $\mathbf{U}$ are generally different orthogonal bases for the column space of $\mathbf{X}$ (Exercise 3.8, refer to Exercis 3.4).
+> Exercise 3.8
+
+The ridge solutions are 
+$$\tag{3.33}
+  \hat{\beta}^{\text{ridge}} = (\mathbf{X}^T\mathbf{X}+\lambda I_p)^{-1}\mathbf{X}^T\mathbf{y} = \sum_{j=1}^p \mathbf{u}_j\frac{d_j^2}{d_j^2+\lambda}\mathbf{u}_j^T\mathbf{y},
+$$
+where $\mathbf{u}_j$ are the columns of $\mathbf{U}$. Factors $d_j^2/(d_j^2+\lambda) \leq 1$. This means that a greater amount of shrinkage is applied to the coordinates of basis vectors with smaller $d_j^2$. 
+
+The columns of $\mathbf{V}$ are called the principal components directions of $\mathbf{X}$. The first principal compnent direction $v_1$ has the property that $\mathbf{z}_1 = \mathbf{X}v_1$ has the largest sample variance amongst all normalized linear combinations of the columns of $\mathbf{X}$. From the fact that the first principal component $\mathbf{z}_1=\mathbf{X}v_1=\mathbf{u}_1d_1$ ($\mathbf{u}_1$ is the normalized first principal component), this sample variance is easily seen to be 
+$$\tag{3.34}
+Var(\mathbf{z}_1) = Var(\mathbf{X}v_1)=\frac{d_1^2}{N}, 
+$$
+In fact, the centered matrix $\mathbf{X}$ has the sample covariance matrix $\mathbf{S}=\mathbf{X}^T\mathbf{X}/N$. The ridge regression shrinks these directions with small variance most.
+
+The effective degrees of freedom of the ridge regression fit is 
+$$\tag{3.35}
+\begin{aligned}
+\text{df}(\lambda) &= \text{trace}(\mathbf{X}(\mathbf{X}^T\mathbf{X}+\lambda I_p)^{-1}\mathbf{X}^T)\\
+&= \text{trace}(\mathbf{H}_{\lambda})\\
+&= \sum_{j=1}^p\frac{d_j^2}{d_j^2+\lambda}. 
+\end{aligned}
+$$
+Of course there is always an additional one degree of freedom for the intercept, which was
+removed apriori.
+### **The Lasso**
+
+The lasso (also known as *basis pursuit*) is a shrinkage method like ridge, with subtle but important differences. 
+$$\tag{3.36}
+\hat{\beta}^{\text{lasso}} = \argmin_{\beta} \bigg\{\frac{1}{2}\sum_{i=1}^N(y_i-\beta_0-\sum_{j=1}^px_{ij}\beta_j)^2+\lambda \sum_{j=1}^p|\beta_j|\bigg\}.
+$$
+Just as in ridge regreesion, we can re-parameterize the constant $\beta_0$ by standardardizing the predictors; the solutions for $\hat{\beta}_0$ is $\bar{y}$, and thereafter we fit a model without an intercept (Exercise 3.5). An equivalent way to write the lasso problem is 
+$$\tag{3.37}
+\begin{aligned}
+\hat{\beta}^{\text{lasso}} = \argmin_{\beta} &\sum_{i=1}^N\bigg(y_i-\beta_0-\sum_{j=1}^px_{ij}\beta_j\bigg)^2.\\
+\text{subject to} &\sum_{j=1}^p|\beta_j| \leq t.
+\end{aligned}$$
+
+> Exercise 3.5
+
+In Section 3.4.4 that efficient algorithms are available for computing the entire path of solutions as $\lambda$ is varied, with the same computational cost as for ridge regression.
+
+### **Discussion: Subset Selection, Ridge Regression and the Lasso**
+
+- Ridge regression does a proportional shrinkage. Lasso translates each coefficient by a constant factor $\lambda$, truncating at zero. This is called “soft thresholding,” and is used in the context of wavelet-based smoothing in Section 5.9. Best-subset selection drops all variables with coefficients smaller than the $M$th largest; this is a form of “hard-thresholding.”
+
+<div align=center>
+<img src="pic/table3.4.png" width="61.8%">
+</div>
+
+- We can generlize ridge regression and the lasso, and view them as Bayes estimates. Consider the criterion
+  $$\tag{3.38}
+  \hat{\beta}^{\text{lasso}} = \argmin_{\beta} \bigg\{\sum_{i=1}^N(y_i-\beta_0-\sum_{j=1}^px_{ij}\beta_j)^2+\lambda \sum_{j=1}^p|\beta_j|^q\bigg\}.
+  $$
+  - $q=0$: subset selection, cout the number of nonzero parameters.
+  - $q=1$: the prior is an independent double exponential (or Laplace) distribution for each input.
+  - $q<1$: the prior is not uniform in direction but concentrates more mass in the corrdinate directions.
+  - $q=2$: the prior is an independent normal distribution.
+  
+  In this view, the lasso, ridge regression and best subset selection are Bayes estimates with different priors.
+- Elastic-net penalty (Section 18.4)
+  $$\tag{3.39}
+  \lambda \sum_{j=1}^p(\alpha \beta^2_j+(1-\alpha)|\beta_j|).
+  $$
+
+### **Least Angle Regression (LAR)**
+
+---
+**Algorithm 3.2** *Least Angle Regression.*
+
+---
+1. Strandardize the predictors to have mean zero and unit norm. Start with the residual $\mathbf{r} = \mathbf{y} - \bar{\mathbf{y}}, \beta_1,\beta_2, ..., \beta_p =0$.
+2. Find the predictor $\mathbf{x}_j$ most correlated with $\mathbf{r}$.
+3. Move $\beta_j$ from $0$ towards its least-squares coefficient $\langle \mathbf{x}_j, \mathbf{r}\rangle$, until some other competitor $\mathbf{x}_k$ has as much correlation with the current residual do does $\mathbf{x}_j$.
+4. Move $\beta_j$ and $\beta_k$ in the direction defined by their joint least squares coefficient of the current residual on $(\mathbf{x}_j, \mathbf{x}_k)$, until some other competitor $\mathbf{x}_l$ has as much correlation with the current residual.
+
+    4a.(Lasso Modification) If a non-zero coefficient hits zero, drop its variable from the active set of variables and recompute the current joint least squares direction. (gives the entire lasso path)
+
+    4b.(FS$_0$ Modification) Find the new direction by solving the constrained least squares problem
+    $$
+    \min_b\|\mathbf{r}-\mathbf{X}_{\mathcal{A}}b\|_2^2 \quad \text{subject to }b_js_j\geq 0, j\in \mathcal{A},
+    $$
+    where $s_j$ is the sign of $\langle \mathbf{x}_j, \mathbf{r} \rangle$.
+
+5. Continue in this way until all $p$ predictors have been entered. After $\min(N-1,p)$ steps, we arrive at the full least-squares solution.
+
+---
+- LAR is intimately connected with the lasso, and in fact provides an extremely efficient algorithm for computing the entire lasso path.
+- Least angle regression uses a similar strategy with Forward stepwise regressionz, but only enters “as much” of a predictor as it deserves. 
+- At the first step it identifies the variable most correlated with the response. Rather than fit this variable completely, LAR moves the coefficient of this variable continuously toward its least-squares value (causing its correlation with the evolving residual to decrease in absolute value).
+  
+Suppose $\mathcal{A}_k$ is the active set of variables at the beginning of the $k$th step, and let $\beta_{\mathcal{A}_k}$ be the coefficient vector for these variables at this step; there will be $k-1$ nonzero values, and the one just entered will be zero. 
+
+If $\mathbf{r}_k = \mathbf{y}-\mathbf{X}_{\mathcal{A}_k}\beta_{\mathcal{A}_k}$ is the current residual, then the direction for this step is 
+  $$\tag{3.40}
+  \delta_k=(\mathbf{X}_{\mathcal{A}_k}^T\mathbf{X}_{\mathcal{A}_k})^{-1}\mathbf{X}_{\mathcal{A}_k}^T\mathbf{r}_k
+  $$
+
+The coefficient profile then evolves as $\beta_{\mathcal{A}_k}(\alpha) = \beta_{\mathcal{A}_k} + \alpha\cdot \delta_k.$ 
+
+(Exercise 3.23) verifies that the directions chosen in this fashion do what is claimed: keep the correlations tied and decreasing.
+>Exercise 3.23 
+
+If $\mathbf{\hat{f}}_k$ is the fit vector, then it evolves as $\mathbf{\hat{f}}_k(\alpha) = \mathbf{\hat{f}}_k+\alpha\cdot \mathbf{u}_k$, where $\mathbf{u}_k = \mathbf{X}_{\mathcal{A}_k}\delta_k$ is the new fit direction.
+
+(Exercise 3.24) $\mathbf{u}_k$ makes the smallest angle with each of the predictors in $\mathcal{A}_k$.
+> Exercise 3.24
+
+<div align=center>
+<img src="pic/figure3.14.png" width="61.8%">
+</div>
+
+Note that we do not need to take small steps and recheck the correlations in step 3; using knowledge of the covariance of the predictors and the piecewise linearity of the algorithm, we can work out the exact step length at the beginning of each step (Exercise 3.25).
+> Exercise 3.25
+
+Least angle regression always takes $p$ steps to get to the full least squares estimates. The lasso path can have more than $p$ steps, although the two are often quite similar.
+
+**Why lasso and LAR are so similar:**
+
+Suppose $\mathcal{A}$ is the active set of variables at some stage in the algorithm, tied in their absolute inner-product with the current residuals, 
+$$\tag{3.41}
+\mathbf{x}_j^T(\mathbf{y}-\mathbf{X}\beta) = \gamma\cdot s_j,\quad \forall j\in \mathcal{A},
+$$
+where $s_j\in\{-1,1\}$, and $\gamma$ is the common value. Also $|\mathbf{x}_k^T(\mathbf{y}-\mathbf{X}\beta)|\leq \gamma \quad \forall k\notin \mathcal{A}$. Let $\mathcal{B}$ be the active set of variables in the solution for a given value of $\lambda$. The stationarity conditions of lasso problem (3.36) give 
+$$\tag{3.42}
+\mathbf{x}_j^T(\mathbf{y}-\mathbf{X}\beta) = \gamma\cdot \text{sign}(\beta_j),\quad \forall j\in \mathcal{B}.
+$$
+Non-activate require that 
+$$\tag{3.43}
+|\mathbf{x}_k^T(\mathbf{y}-\mathbf{X}\beta)|\leq \lambda, \quad \forall k\notin \mathcal{B},
+$$
+which again agrees with the LAR algorithm.
+
+(Exercise 3.27) shows that these equations imply a piecewise-linear coefficient profile as λ decreases.
+> Exercise 3.27
+
+**Degrees-of-Freedom Formula for LAR and Lasso**
