@@ -532,3 +532,58 @@ which again agrees with the LAR algorithm.
 > Exercise 3.27
 
 **Degrees-of-Freedom Formula for LAR and Lasso**
+
+In classical statistics, the number of linearly independent parameters is what is meant by "degrees of freedom". How many parameters, or "degrees of freedom" have we used?
+
+- For a sutset of $k$ features, if this subset is presparecified in advance without reference to the training data, then the degrees of freedomis $k$. However, if a best subset selection to determine the optimal set of $k$ predictors, then in some sence, the degrees of freedom may more than $k$.
+- The definition of the degrees of freedom of the fitted vector $\mathbf{\hat{y}}=(\hat{y}_1, \hat{y}_2, ..., \hat{y}_N)$ is 
+  $$\tag{3.44}
+  \text{df}(\mathbf{\hat{y}}) = \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).
+  $$
+  $Cov(\hat{y}_i, y_i)$ refers to the **covariance** between the predicted value and output value. This makes intuitive sense: the harder that we fit to the data, the larger this covariance and hence $\text{df}(\mathbf{\hat{y}})$. (This definition is motivated and discussed further in Sections 7.4-7.6).
+
+  Note that in Section 3.2, we have assumed that the observations $y_i$ are uncorrelated and have constant variance $\sigma^2$, and that $x_i$ are fixed (non random).
+- For a linear regression with $k$ fixed predictors, it is easy to show that $\text{df}(\mathbf{\hat{y}})=k$.
+  > *Proof.*  
+  > $$\begin{aligned}
+  \text{df}(\mathbf{\hat{y}}) &= \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).\\
+  &= \frac{1}{\sigma^2}\sum_{i=1}^NE((\hat{y}_i-E\hat{y}_i)(y_i-Ey_i))\\
+  &= \frac{1}{\sigma^2}E\bigg( \sum_{i=1}^N(\hat{y}_i-E\hat{y}_i)(y_i-Ey_i)\bigg) \\
+  &= \frac{1}{\sigma^2}E\bigg( (\mathbf{\hat{y}}-E\mathbf{\hat{y}})^T(\mathbf{y}-E\mathbf{y})\bigg) \\
+  &= \frac{1}{\sigma^2} E\bigg((\mathbf{y}-E\mathbf{y})^TH^T (\mathbf{y}-E\mathbf{y}) \bigg)\\
+  &= \frac{1}{\sigma^2} \sum_{i=1}^N \sigma^2 H_{ii} \\
+  &= \text{trace}(H) \\
+  &= k
+  \end{aligned}
+  > $$
+
+- For ridge regression, this definition leads to the closed-form expression (3.35): $\text{df}(\mathbf{\hat{y}})=\text{trace}(\mathbf{S}_{\lambda})$.
+  > *Proof.*  
+  > Recall the expression (3.35), 
+  > $$
+  \begin{aligned}
+   \text{df}(\lambda) &= \text{trace}(\mathbf{X}(\mathbf{X}^T\mathbf{X}+\lambda I_p)^{-1}\mathbf{X}^T)\\
+  &= \text{trace}(\mathbf{H}_{\lambda})\\
+  &= \sum_{j=1}^p\frac{d_j^2}{d_j^2+\lambda}. 
+  \end{aligned}
+  > $$
+  > For lasso, the definition of $S_{\lambda} = H_{\lambda}$, 
+  >  $$\begin{aligned}
+  \text{df}(\mathbf{\hat{y}}) &= \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).\\
+  &= \frac{1}{\sigma^2}\sum_{i=1}^NE((\hat{y}_i-E\hat{y}_i)(y_i-Ey_i))\\
+  &= \frac{1}{\sigma^2}E\bigg( \sum_{i=1}^N(\hat{y}_i-E\hat{y}_i)(y_i-Ey_i)\bigg) \\
+  &= \frac{1}{\sigma^2}E\bigg( (\mathbf{\hat{y}}-E\mathbf{\hat{y}})^T(\mathbf{y}-E\mathbf{y})\bigg) \\
+  &= \frac{1}{\sigma^2} E\bigg((\mathbf{y}-E\mathbf{y})^TH_{\lambda}^T (\mathbf{y}-E\mathbf{y}) \bigg)\\
+  &= \text{trace}(H_{\lambda}) \\
+  &= \text{trace}{(S_{\lambda})}
+  \end{aligned}
+  > $$
+
+
+- For best subset selection, there is no closed form method. It could be estimate by simulation.
+- For LAR, it can be shown that after the $k$th step of the LAR procedure, the effective degrees of freedom of the fit vector is **approximately** $k$.
+   > Theorem 3 from Efron et al.(2004):  
+   > Least angle regression. Annals of Statistics, 32, 407–451.
+- For lasso and (modified) LAR, it often takes more than $p$ steps, since predictors can drop out. Hence the definition is a little different.
+  >  A detailed study may be found in Zou et al.(2007):  
+  >  *On the degrees of freedom of the lasso, Annals of Statistcs 35(5):2173-2192*.
