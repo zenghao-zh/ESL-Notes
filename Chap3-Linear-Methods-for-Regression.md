@@ -300,7 +300,7 @@ $$\tag{3.24}
 $$
 The least squares estimates have exactly the same form as before
 $$\tag{3.25}
-\mathbf{\hat{B}} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{Y}.
+\hat{\mathbf{B}} = (\mathbf{X}^T\mathbf{X})^{-1}\mathbf{X}^T\mathbf{Y}.
 $$
 Hence the coefficients for the $k$th outcome are just the least squares estimates in the regression of $\mathbf{y}_k$ on $\mathbf{x}_0, \mathbf{x}_1,...,\mathbf{x}_p$. Multiple outputs do not affect one another’s least squares estimates.
 
@@ -536,20 +536,20 @@ which again agrees with the LAR algorithm.
 In classical statistics, the number of linearly independent parameters is what is meant by "degrees of freedom". How many parameters, or "degrees of freedom" have we used?
 
 - For a sutset of $k$ features, if this subset is presparecified in advance without reference to the training data, then the degrees of freedomis $k$. However, if a best subset selection to determine the optimal set of $k$ predictors, then in some sence, the degrees of freedom may more than $k$.
-- The definition of the degrees of freedom of the fitted vector $\mathbf{\hat{y}}=(\hat{y}_1, \hat{y}_2, ..., \hat{y}_N)$ is 
+- The definition of the degrees of freedom of the fitted vector $\hat{\mathbf{y}}=(\hat{y}_1, \hat{y}_2, ..., \hat{y}_N)$ is 
   $$\tag{3.44}
-  \text{df}(\mathbf{\hat{y}}) = \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).
+  \text{df}(\hat{\mathbf{y}}) = \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).
   $$
-  $Cov(\hat{y}_i, y_i)$ refers to the **covariance** between the predicted value and output value. This makes intuitive sense: the harder that we fit to the data, the larger this covariance and hence $\text{df}(\mathbf{\hat{y}})$. (This definition is motivated and discussed further in Sections 7.4-7.6).
+  $Cov(\hat{y}_i, y_i)$ refers to the **covariance** between the predicted value and output value. This makes intuitive sense: the harder that we fit to the data, the larger this covariance and hence $\text{df}(\hat{\mathbf{y}})$. (This definition is motivated and discussed further in Sections 7.4-7.6).
 
   Note that in Section 3.2, we have assumed that the observations $y_i$ are uncorrelated and have constant variance $\sigma^2$, and that $x_i$ are fixed (non random).
-- For a linear regression with $k$ fixed predictors, it is easy to show that $\text{df}(\mathbf{\hat{y}})=k$.
+- For a linear regression with $k$ fixed predictors, it is easy to show that $\text{df}(\hat{\mathbf{y}})=k$.
   > *Proof.*  
   > $$\begin{aligned}
-  \text{df}(\mathbf{\hat{y}}) &= \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).\\
+  \text{df}(\hat{\mathbf{y}}) &= \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).\\
   &= \frac{1}{\sigma^2}\sum_{i=1}^NE((\hat{y}_i-E\hat{y}_i)(y_i-Ey_i))\\
   &= \frac{1}{\sigma^2}E\bigg( \sum_{i=1}^N(\hat{y}_i-E\hat{y}_i)(y_i-Ey_i)\bigg) \\
-  &= \frac{1}{\sigma^2}E\bigg( (\mathbf{\hat{y}}-E\mathbf{\hat{y}})^T(\mathbf{y}-E\mathbf{y})\bigg) \\
+  &= \frac{1}{\sigma^2}E\bigg( (\hat{\mathbf{y}}-E\hat{\mathbf{y}})^T(\mathbf{y}-E\mathbf{y})\bigg) \\
   &= \frac{1}{\sigma^2} E\bigg((\mathbf{y}-E\mathbf{y})^TH^T (\mathbf{y}-E\mathbf{y}) \bigg)\\
   &= \frac{1}{\sigma^2} \sum_{i=1}^N \sigma^2 H_{ii} \\
   &= \text{trace}(H) \\
@@ -557,7 +557,7 @@ In classical statistics, the number of linearly independent parameters is what i
   \end{aligned}
   > $$
 
-- For ridge regression, this definition leads to the closed-form expression (3.35): $\text{df}(\mathbf{\hat{y}})=\text{trace}(\mathbf{S}_{\lambda})$.
+- For ridge regression, this definition leads to the closed-form expression (3.35): $\text{df}(\hat{\mathbf{y}})=\text{trace}(\mathbf{S}_{\lambda})$.
   > *Proof.*  
   > Recall the expression (3.35), 
   > $$
@@ -569,10 +569,10 @@ In classical statistics, the number of linearly independent parameters is what i
   > $$
   > For lasso, the definition of $S_{\lambda} = H_{\lambda}$, 
   >  $$\begin{aligned}
-  \text{df}(\mathbf{\hat{y}}) &= \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).\\
+  \text{df}(\hat{\mathbf{y}}) &= \frac{1}{\sigma^2} \sum_{i=1}^NCov(\hat{y}_i, y_i).\\
   &= \frac{1}{\sigma^2}\sum_{i=1}^NE((\hat{y}_i-E\hat{y}_i)(y_i-Ey_i))\\
   &= \frac{1}{\sigma^2}E\bigg( \sum_{i=1}^N(\hat{y}_i-E\hat{y}_i)(y_i-Ey_i)\bigg) \\
-  &= \frac{1}{\sigma^2}E\bigg( (\mathbf{\hat{y}}-E\mathbf{\hat{y}})^T(\mathbf{y}-E\mathbf{y})\bigg) \\
+  &= \frac{1}{\sigma^2}E\bigg( (\hat{\mathbf{y}}-E\hat{\mathbf{y}})^T(\mathbf{y}-E\mathbf{y})\bigg) \\
   &= \frac{1}{\sigma^2} E\bigg((\mathbf{y}-E\mathbf{y})^TH_{\lambda}^T (\mathbf{y}-E\mathbf{y}) \bigg)\\
   &= \text{trace}(H_{\lambda}) \\
   &= \text{trace}{(S_{\lambda})}
@@ -583,7 +583,187 @@ In classical statistics, the number of linearly independent parameters is what i
 - For best subset selection, there is no closed form method. It could be estimate by simulation.
 - For LAR, it can be shown that after the $k$th step of the LAR procedure, the effective degrees of freedom of the fit vector is **approximately** $k$.
    > Theorem 3 from Efron et al.(2004):  
-   > Least angle regression. Annals of Statistics, 32, 407–451.
+   > *Least angle regression. Annals of Statistics, 32, 407–451.*
 - For lasso and (modified) LAR, it often takes more than $p$ steps, since predictors can drop out. Hence the definition is a little different.
   >  A detailed study may be found in Zou et al.(2007):  
   >  *On the degrees of freedom of the lasso, Annals of Statistcs 35(5):2173-2192*.
+
+## **Methods Using Derived Input Directions**
+
+In many situations we have a large number of inputs, often very correlated. The methods in this section produce a small number of linear combinations $Z_m, m = 1,...,M$ of the original inputs $X_j$, and the $Z_m$ are then used in place of the $X_j$ as inputs in the regression. The methods differ in how the linear combinations are constructed.
+
+### **Principal Components Regression**
+
+Principal component regression forms the derived input columns $\mathbf{z}_m=\mathbf{X}v_m$ (the lengh vector for each training data in $v_m$ directions.), and then regresses $\mathbf{y}$ on $\mathbf{z}_1, \mathbf{z}_2,..., \mathbf{z}_M$ for some $M\leq p$. Since $\mathbf{z}_m$ are orthogonal, this regression is just a sum of univariate regressions:
+$$\tag{3.45}
+\hat{\mathbf{y}}^{\text{pcr}}_{(M)}=\bar{y}\mathbf{1} + \sum_{m=1}^M\hat{\theta}_{m}\mathbf{z}_m,
+$$
+where $\hat{\theta}_m=\langle \mathbf{z}_m, \mathbf{y}\rangle/\langle \mathbf{z}_m, \mathbf{z}_m \rangle$. Since the $\mathbf{z}_m$ are each linear combinations of the original $\mathbf{x}_j$, we can express the solution (3.45) in terms of coefficients of the $\mathbf{x}_j$ (Exercise 3.13):
+$$\tag{3.46}
+\hat{\beta}^{\text{pcr}}(M) = \sum_{m=1}^M\hat{\theta}_mv_m.
+$$
+> Exercise 3.13.
+
+- As with ridge regression, principal components depend on the scaling of the inputs, so typically we first standardize them.
+- If $M=p$, we would just get back the uasual least squares estimates, since $\mathbf{Z}=\mathbf{U}\mathbf{D}$ span the column space of $\mathbf{X}$.
+- If $M<p$, we get a reduced regression.
+- Ridge regression shrinks the regression coefficients of the principal components, using shrinkage factors $d^2_j /(d^2_j + \lambda)$ . Principal component regression truncates them.
+-  It can be shown (Exercise 3.15) that principal components regression seeks directions that have high variance, in particular, the $m$th principal component direction $v_m$ solves:
+   $$\tag{3.47} 
+   \max_{\alpha} Var(\mathbf{X}\alpha)  \\
+   \text{subject to }\|\alpha\|=1, \alpha^T\mathbf{S}v_{\ell}=0, \ell=1,...,m-1,
+   $$
+   where $\mathbf{S}$ is the sample covariance matrix of the $\mathbf{x}_j$.
+   > Exercise 3.15
+
+### **Partial Least Squares**
+
+This technique constructs linear combinations of the inputs for regression by using $\mathbf{y}$. We assume that each $\mathbf{x}_j$ is standardized to have mean $0$ and variance $1$.
+
+---
+**Algorithm 3.3** *Partial Least Squares.*
+
+---
+1. Standardize each $\mathbf{x}_j$ to have mean zero and variance one. Set $\hat{\mathbf{y}}^{(0)}=\bar{y}\mathbf{1},$ and $\mathbf{x}_j^{(0)}=\mathbf{x}_j, j=1,...,p$.
+2. For $m=1,2,...,p$  
+   (a) $\mathbf{z}_m=\sum_{j=1}^p\hat{\phi}_{mj}\mathbf{x}_j^{(m-1)}$, where $\hat{\phi}_{mj}=\langle \mathbf{x}_j^{(m-1)}, \mathbf{y} \rangle$.  
+   (b) $\hat{\theta}_m = \langle \mathbf{z}_m, \mathbf{y}\rangle/\langle \mathbf{z}_m, \mathbf{z}_m \rangle$.  
+   (c) $\hat{\mathbf{y}}^{(m)}=\hat{\mathbf{y}}^{(m-1)}+\hat{\theta}_m\mathbf{z}_m$.  
+   (d) Orthogonalize each $\mathbf{x}_j^{(m-1)}$ with respect to $\mathbf{z}_m$: $\mathbf{x}^{(m)}_j=\mathbf{x}_j^{(m-1)}-[\langle \mathbf{z}_m, \mathbf{x}_j^{(m-1)}\rangle/\langle \mathbf{z}_m, \mathbf{z}_m \rangle]\mathbf{z}_m, j=1,2,...,p$.  
+3. Output the sequence of fitted vectors $\{\hat{\mathbf{y}}^{(m)}\}_1^p$. Since the $\{\mathbf{z}_{\ell}\}_1^m$ are linear in the original $\mathbf{x}_j$, so is $\hat{\mathbf{y}}^{(m)}=\mathbf{X} \hat{\beta}^{\text{pls}}(m)$. These linear coefficients can be recovered from the sequence of PLS transformations.
+
+---
+- How to recover the linear coefficients $\hat{\beta}^{\text{pls}}(m)$ ?
+   > **(ZH):** The best solution is that $\mathbf{X}$ is full column rank. Most regression software packages detect these redundancies and automatically implement $x_1$ some strategy for removing them.
+- Not scale invariant
+- If $M=p$, we would get back a solution equivalent to the usual least squares estimates.
+- If $M<p$, it produces a reduced regression.
+- The first directions $\hat{\phi}_{1j}$ are the univariate regression coefficients (up to an irrelevant constant); this is not the case for subsequent directions.
+- It can be shown (Exercise 3.15) that principal components regression seeks directions that have high variance, in particular, the $m$th PLS direction $\hat{\phi}_m$ solves:
+   $$\tag{3.48} 
+   \max_{\alpha} Corr^2(\mathbf{y},\mathbf{X}\alpha)Var(\mathbf{X}\alpha)  \\
+   \text{subject to }\|\alpha\|=1, \alpha^T\mathbf{S}\hat{\phi}_{\ell}=0, \ell=1,...,m-1,
+   $$
+   where $\mathbf{S}$ is the sample covariance matrix of the $\mathbf{x}_j$. Further analysis reveals that the variance aspect tends to dominate, and so partial least squares behaves much like ridge regression and principal components regression.
+   > Exercise 3.15
+- (Exercise 3.14) If the input matrix $\mathbf{X}$ is orthogonal, then partial least squares finds the least squares estimats after $m=1$ steps. Subsequent step have no effect since the $\hat{\phi}_{mj}$ are zero for $m>1$.
+   > Exercise 3.14.
+
+- (Exercise 3.18) the sequence of PLS coefficients for $m =1,2,...,p$ represents the conjugate gradient sequence for computing the least squares solutions.
+   > Exercise 3.18.
+
+## **Discussion: A Comparison of the Selection and Shrinkage Methods**
+
+<div align=center>
+<img src="pic/figure3.18.png" width="61.8%">
+</div>
+
+- The tuning parameters for ridge and lasso vary over a continuous range, while best subset, PLS and PCR take just two discrete steps to the least squares solution.
+- In the top panel, starting at the origin, ridge regression shrinks the coefficients together until it finally converges to least squares. PLS and PCR show similar behavior to ridge, although are discrete and more extreme. Best subset overshoots the solution and then backtracks. The behavior of the lasso is intermediate to the other methods.
+
+- When the correlation is negative (lower panel), again PLS and PCR roughly track the ridge path, while all of the methods are more similar to one another.
+- Ridge regression shrinks all directions, but shrinks low-variance directions more.
+-  Principal components regression leaves $M$ high-variance directions alone, and discards the rest. 
+-  Partial least squares also tends to shrink the low-variance directions, but can actually inflate some of the higher variance directions. This can make PLS a little unstable, and cause it to have slightly higher prediction error compared to ridge regression. 
+   > Frank and Friedman (1993)  
+   > *Frank, I. and Friedman, J. (1993). A statistical view of some chemometrics regression tools (with discussion), Technometrics 35(2): 109–148.*  
+   > These authors conclude that for minimizing prediction error, ridge regression is generally preferable to variable subset selection, principal components regression and partial least squares. However the improvement over the latter two methods was only slight.
+
+To summarize, PLS, PCR and ridge regression tend to behave similarly. Ridge regression may be preferred because it shrinks smoothly, rather than in discrete steps. Lasso falls somewhere between ridge regression and best subset regression, and enjoys some of the properties of each.
+
+## **Multiple Outcome Shrinkage and Selection 🤔**
+
+## **More on the Lasso and Related Path Algorithms**
+
+### **Incremental Forward Stagewise Regression**
+
+Here we present another LAR-like algorithm, this time focused on forward stagewise regression. Interestingly, efforts to understand a flexible nonlinear regression procedure (boosting) led to a new algorithm for linear models (LAR). 
+
+---
+**Algorithm 3.4** *Incremental Forward Stagewise Regression——$FS_{\epsilon}$*.
+
+---
+1. Start with the residual $\mathbf{r}$ equal to $\mathbf{y}$ and $\beta_1,\beta_2,...,\beta_p=0$. All the predictors are standardized to have mean zero and unit norm.
+2. Find the predictor $\mathbf{x}_j$ most correlated with $\mathbf{r}$.
+3. Update $\beta_j \leftarrow \beta_j+\delta_j$, where $\delta_j=\epsilon\cdot \text{sign}[\langle \mathbf{x}_j, \mathbf{r}\rangle]$ and $\epsilon >0$ is a small step size, and set $\mathbf{r} \leftarrow \mathbf{r} -\delta_j \mathbf{x}_j$.
+4. Repeat steps 2 and 3 many times, untile the residuals are uncorrelated with all the predictors.
+
+---
+
+<div align=center>
+<img src="pic/figure3.19.png" width="61.8%">
+</div>
+
+Related algorithms and relationship:
+1. Section 3.4.4 LAR
+2. Chapter 16 Algorithm 16.1
+3. LAR least-squares fit amongst the tied predictors can result in coefficients moving in the opposite direction to their correla- tion, which cannot happen in Algorithm 3.4. (FS$_0$ Modification)
+4. As a consequence of these results, if the LAR profiles are monotone non-increasing or non-decreasing, as they are in Figure 3.19, then all three methods—LAR, lasso, and FS$_0$—give identical profiles. If the profiles are not monotone but do not cross the zero axis, then LAR and lasso are identical.
+
+### **Piecewise-Linear Path algorithms**
+Suppose we solve
+$$\tag{3.49}
+\hat{\beta}(\lambda) = \argmin_\beta[R(\beta)+\lambda J(\beta)],
+$$
+with 
+$$\tag{3.50}
+R(\beta) = \sum_{i=1}^NL(y_i, \beta_0+\sum_{j=1}^px_{ij}\beta_j),
+$$
+where both the loss function $L$ and the penalty function $J$ are convex. Then the following are sufficient conditions for the solution path $\hat{\beta}(\lambda)$ to be piecewise linear (Rosset and Zhu, 2007):
+   1. $R$ is quadratic or piecewise-quadratic as a function of $\beta$, and
+   2. $J$ is piecewise linear in $\beta$.
+   
+This also implies (in principle) that the solution path can be efficiently computed. Another example is the “hinge loss” function used in the support vector machine. There the loss is piecewise linear, and the penalty is quadratic. 
+### **The Dantzig Selector**
+
+Candes and Tao (2007) proposed the following criterion:
+$$\tag{3.51}
+\min_{\beta}\|\beta\|_1 \text{ subject to } \|\mathbf{X}^T(\mathbf{y}-\mathbf{X}\beta)\|_{\infty}\leq s.
+$$
+It can be written equivalently as 
+$$\tag{3.52}
+\min_{\beta} \|\mathbf{X}^T(\mathbf{y}-\mathbf{X}\beta)\|_{\infty} \text{ subject to } \|\beta\|_1\leq t.
+$$
+Note that as $t$ gets large, both procedures yield the least squares solution if $N < p$. If $p \geq N$, they both yield the least squares solution with minimum $L_1$ norm.
+
+Candes and Tao (2007) show that the solution to DS is a linear pro- gramming problem; hence the name Dantzig selectors.
+
+1. the solution to DS is a linear programming problem;
+2. The Dantzig selector instead tries to minimize the maximum inner product of the current residual with all the predictors. Hence it can achieve a smaller maximum than the lasso, but in the process a curious phenomenon can occur. If the size of the active set is $m$, there will be $m$ variables tied with maximum correlation. However, these need not coincide with the active set! Hence it can include a variable in the model that has smaller correlation with the current residual than some of the excluded variables.
+3. DS can yield extremely erratic coefficient paths as the regularization parameter $s$ is varied.
+
+### The Grouped Lasso
+
+In some problems, the predictors belong to pre-defined groups. Suppose that the $p$ predictors are divided into $L$ groups, with $p_{\ell}$ the number in group $\ell$. For ease of notation, we use a matrix $\mathbf{X}_{\ell}$ to represent the predictors corresponding to the lth group, with corresponding coefficient vector $\beta_{\ell}$. The grouped-lasso minimizes the convex criterion
+$$\tag{3.53}
+\min_{\beta\in \mathbf{R}^p} \bigg(\|\mathbf{y}-\beta_0\mathbf{1}-\sum_{\ell=1}^L \mathbf{X}_{\ell}\beta_{\ell}\|_2^2 +\lambda \sum_{\ell=1}^L\sqrt{p_{\ell}}\|\beta_{\ell}\|_2\bigg),
+$$
+where the $\sqrt{p_{\ell}}$ terms accounts for the varying group sizes. Since the Euclidean norm of a vector $\beta_{\ell}$ is zero only if all of its components are zero, this procedure encourages sparsity at both the group and individual levels. That is, for some values of $\lambda$, an entire group of predictors may drop out of the model. There are also connections to methods for fitting sparse additive models (Lin and Zhang, 2006; Ravikumar et al., 2008).
+
+### **Further Properties of the Lasso**
+
+Some methods for $p>N$, such as weigted $\ell_1$, SCAD, and so on, were discussed here.
+
+### **Pathwise Coordinate Optimization**
+
+An alternate approach to the LARS algorithm for computing the lasso solution is simple coordinate descent. The idea is to fix the penalty parameter $\lambda$ in the Lagrangian form (3.36) and optimize successively over each parameter, holding the other parameters fixed at their current values. 
+
+Suppose the predictors are all standardized to have mean zero and unit norm. Denote by $\tilde{\beta}_k(\lambda)$ the current estimate for $\beta_k$ at penalty parameter $\lambda$. We can rearrange (3.36) to isolate $\beta_j$, 
+$$\tag{3.54}
+R(\tilde{\beta}(\lambda),\beta_j) = \frac{1}{2}\sum_{i=1}^N\bigg(y_i-\sum_{k\neq j} x_{ik}\tilde{\beta}_k(\lambda)-x_{ij}\beta_j\bigg)^2+\lambda \sum_{k\neq j}|\tilde{\beta}_k(\lambda)| + \lambda|\beta_j|,
+$$
+where we have suppressed the intercept and introduced a factor $\frac{1}{2}$ for convenience.  This can be viewed as a univariate 􏰗lasso problem with response variable the partial residual $y_i-\tilde{y}_i^{(j)} = y_i-\sum_{k\neq j}x_{ik}\tilde{\beta}_k(\lambda)$. This has a explicit solution, resulting in the update
+$$\tag{3.55}
+  \tilde{\beta}_j \leftarrow S\bigg(\sum_{i=1}^Nx_{ij}(y_i-\tilde{y}_i^{(j)}), \lambda\bigg).
+$$
+Here $S(t,\lambda)=\text{sign}(t)(|t|-\lambda)_+$ is the soft-thresholding operator. Repeated iteration of (3.55)—cycling through each variable in turn until convergence—yields the lasso estimate $\hat{\beta}(\lambda)$.
+
+We can also use this simple algorithm to efficiently compute the lasso solutions at a grid of values of $\lambda$. We start with the largest value $\lambda_{\max}$ for which $\hat{\beta}(\lambda_{\max}) = 0$, decrease it a little and cycle through the variables until convergence. Then $\lambda$ is decreased again and the process is repeated, using the previous solution as a “warm start” for the new value of $\lambda$. This can be faster than the LARS algorithm, especially in large problems.
+
+A key to its speed is the fact that the quantities in (3.55) can be updated quickly as $j$ varies, and often the update is to leave $\tilde{\beta}_j = 0$. On the other hand, it delivers solutions over a grid of $\lambda$ values, rather than the entire solution path.
+
+The same kind of algorithm can be applied to the elastic net, the grouped lasso and many other models in which the penalty is a sum of functions of the individual parameters (Friedman et al., 2010). It can also be applied, with some substantial modifications, to the fused lasso (Section 18.4.2); details are in Friedman et al. (2007).
+
+## **Computational Considerations**
+
+Cholesky decomposition of the matrix $\mathbf{X}^T\mathbf{X}$ ($p^3+Np^2/2$) or a QR decomposition of $\mathbf{X}$ (Np^2). Depending on the relative size of $N$ and $p$, the Cholesky can sometimes be faster; on the other hand, it can be less numerically stable (Lawson and Hansen, 1974).  Computation of the lasso via the LAR algorithm has the same order of computation as a least squares fit.
