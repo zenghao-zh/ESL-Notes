@@ -136,7 +136,7 @@ Since this derivation of the LDA direction via least squares does not use a Gaus
 
 Getting back to the general discriminant problem (4.8), if the $\Sigma_k$ are not assumed to be equal, then the convenient cancellations in (4.9) do not occur, we then get *quadratic discriminant functions* (QDA),
 $$\tag{4.12}
-\delta_k(x) = -\frac{1}{2}\log|\Sigma_k|-\frac{1}{2}(x-\mu_k)^T\Simga_k^{-1}(x-\mu_k)+\log\pi_k.
+\delta_k(x) = -\frac{1}{2}\log|\Sigma_k|-\frac{1}{2}(x-\mu_k)^T\Sigma_k^{-1}(x-\mu_k)+\log\pi_k.
 $$
 The decision boundary between each pair of classes $k$ and $\ell$ is described by a quadratic equation $\{x : \delta_k(x) = \delta_{\ell}(x)\}$.
 
@@ -174,13 +174,116 @@ In Chapter 12, we discuss other regularized versions of LDA, which are more suit
 
 ### **4.3.2 Computations for LDA**
 
-We briefly digress on the computations required for LDA and especially QDA. By the eigen decomposition for each $\hat{\Sigma}_k=U_kD_kU_k^T$, where $U_k$ is $p\times p$ orthonormal and $D_k$ a diagonal matrix of positive eigenvalues $d_{k\ell}$. Then the ingredients for $\delta_k(x)$ (4.12) are
-  -  $(x-\hat{\mu}_k)^T\hat{\Sigma}_k^{-1}(x-\hat{\mu}_k) = [U_k^T(x-\hat{\mu}_k)]^TD_k^{-1}[U_k^T(x-\hat{\mu}_k)]$;
+We briefly digress on the computations required for LDA and especially QDA. By the eigen decomposition for each $\hat{\Sigma}_k=\mathbf{U_kD_kU_k}^T$, where $\mathbf{U}_k$ is $p\times p$ orthonormal and $\mathbf{D}_k$ a diagonal matrix of positive eigenvalues $d_{k\ell}$. Then the ingredients for $\delta_k(x)$ (4.12) are
+  -  $(x-\hat{\mu}_k)^T\hat{\Sigma}_k^{-1}(x-\hat{\mu}_k) = [\mathbf{U}_k^T(x-\hat{\mu}_k)]^T\mathbf{D}_k^{-1}[\mathbf{U}_k^T(x-\hat{\mu}_k)]$;
   - $\log|\hat{\Sigma}_k|=\sum_{\ell}\log d_{k\ell}$.
 
 In light of the computational steps outlined above, the LDA classifier
 can be implemented by the following pair of steps:
 
-  - *Sphere* the1data with respect to the common covariance estimate $\hat{\Sigma}: X^* \leftarrow D^{-\frac{1}{2}} U^T X$, where $\hat{\Sigma} = UDU^T$. The common covariance estimate of $X^*$ will now be the identity.
-  - Classify to the closest class centroid in the transformed space, modulo the effect of the class prior probabilities $\pi_k$.
+  - *Sphere* the1data with respect to the common covariance estimate $\hat{\Sigma}: X^* \leftarrow D^{-\frac{1}{2}} U^T X$, where $\hat{\Sigma} = \mathbf{UDU}^T$. The common covariance estimate of $X^*$ will now be the identity.
+  
+    > Since $\hat{\Sigma} = \mathbf{UDU}^T$, 
+    > $$
+    \hat{\Sigma}^* = \mathbf{D}^{-\frac{1}{2}}\mathbf{U}^T\hat{\Sigma}\mathbf{U}\mathbf{D}^{-\frac{1}{2}} = \mathbf{D}^{-\frac{1}{2}}\mathbf{U}^T\mathbf{U}\mathbf{D}\mathbf{U}^T\mathbf{U}\mathbf{D}^{-\frac{1}{2}} = \mathbf{I}.
 
+    > $$
+
+  - Classify to the closest class centroid in the transformed space, modulo the effect of the class prior probabilities $\pi_k$.
+    >  $$\delta^*_k(x)=-\frac{1}{2}\|x^*-\hat{\mu}^*_k\|_2^2+\log \pi_k$$ 
+
+### **4.3.3 Reduced-Rank Linear Discriminant Analysis**
+
+LDA as a restricted Gaussian classifier allow us to view informative low-dimensional projections of the data. The $K$ centroids in $p$-dimensional input space lie in an affine subspace of dimension $\leq K-1$, and if $p$ is much larger than $K$, this will be a considerable drop in dimension. Moreover, in locating the closest centroid, we can ignore distances orthogonal to this subspace, since they will contribute equally to each class. Thus there is a fundamental dimension reduction in LDA, namely, that we need only consider the data in a subspace of dimension at most $K − 1$.
+
+We might then ask for a $L< K-1$ dimensinal subspace $H_L\subset H_{K-1}$ optimal for LDA in some sense. Fisher defined optimal to mean that the projected centroids were spread out as much as possible in terms of variance. This amounts to finding principal component subspaces of the centroids themselves. 
+
+Figure 4.4 shows such an optimal two-dimensional subspace for the vowel data. Here there are eleven classes, each a different vowel sound, in a ten-dimensional input space. The centroids require the full space in this case, since $K − 1 = p$, but we have shown an optimal two-dimensional subspace.  The dimensions are ordered, so we can compute additional dimensions in sequence.
+
+Figure 4.8 shows four additional pairs of coordinates, also known as canonical or discriminant variables.
+<div align=center>
+<img src="pic/figure4.8.png" width="61.8%">
+</div>
+
+In summary, finding the sequences of optimal subspaces for LDA involves the following steps:
+  - compute the $K\times p$ matrix of class centroids $\mathbf{M}$ and the common covariance matrix $\mathbf{W}$ (for within-class covariance);
+  - compute $\mathbf{M}^*=\mathbf{M}\mathbf{W}^{-\frac{1}{2}}$ using the eigen-decomposition of $\mathbf{W}$;
+  - compute $\mathbf{B}^*$, the covariance matrix of $\mathbf{M}^*$ ($\mathbf{B}$ for between-class covariance), and its eigen-decomposition $\mathbf{B}^*=\mathbf{V}^*\mathbf{D}_{B}\mathbf{V}^{*T}$. The columns $v_{\ell}^*$ of $\mathbf{V}^*$ in sequence from first to last define the coordinates of the optimal subspaces.
+
+Combining all these operations the $\ell$th discriminant variable is given by $Z_{\ell}=v_{\ell}^TX$ with $v_{\ell}=\mathbf{W}^{-\frac{1}{2}}v_{\ell}^*$.
+
+Fisher arrived at this decomposition via a different route, without referring to Gaussian distributions at all. He posed the problem:
+
+*Find the linear combination $Z = a^TX$ such that the between-class variance is maximized relative to the within-class variance.*
+
+> The between class variance matrix is the variance of the class means of $X$, 
+> $$
+\mathbf{B} = \sum_{k=1}^{K}\sum_{g_{i}=k}{(\hat{\mu}_{k}-\hat{\mu})(\hat{\mu}_{k}-\hat{\mu})^{T}/(K-1)},
+> $$
+>
+>
+> the within class variance is the pooled variance about the means
+> $$
+\mathbf{W} = \sum_{k=1}^{K}\sum_{g_{i}=k}{(x_{i}-\hat{\mu}_{k})(x_{i}-\hat{\mu}_{k})^{T}/(N-K)},
+> $$
+> The total covariance matrix of $X$, ignoring class information
+> $$
+\mathbf{T} = \sum_{k=1}^K\sum_{g_i=k}(x_i-\hat{\mu})(x_i-\hat{\mu})^T/(N-1).
+> $$
+> It is easy to prove that $\mathbf{T=B+W}$.
+> The between-class variance of $Z$ is $a^T\mathbf{B}a$ and the within-class variance is $a^T\mathbf{W}a$.
+
+Figure 4.9 shows why this criterion makes sense. 
+<div align=center>
+<img src="pic/figure4.9.png" width="61.8%">
+</div>
+
+Fisher's problem therefore amounts to maximizing the *Rayleigh quotient*,
+$$\tag{4.15}
+\max_a\frac{a^T\mathbf{B}a}{a^T\mathbf{W}a},
+$$
+or equivalently 
+$$\tag{4.16}
+\max_a a^T\mathbf{B}a \text{ subject to } a^T\mathbf{W}a=1.
+$$
+> which can rewrite after the convenient basis change $a^* = \mathbf{W}^{1/2}a$, $a^T\mathbf{B}a = a^{*T}\mathbf{W}^{-1/2}\mathbf{B}\mathbf{W}^{-1/2}a^* = a^{*T}\mathbf{B}^*a^*$, 
+> $$
+\min_{a^*}-\frac{1}{2}a^{*T}\mathbf{B}^*a^* \text{ subject to } a^{*T}a^*=1.
+> $$
+> The Lagrangien for this problem writes
+> $$
+L=-\frac{1}{2}a^{*T}\mathbf{B}^*a^*+\frac{1}{2}\lambda(a^{*T}a^*-1).
+> $$
+> and the Karush-Kuhn-Tucker conditions give
+> $$
+\mathbf{B}^*a^*=\lambda a^* \equiv \mathbf{W}^{-1}\mathbf{B}a=\lambda a.
+> $$
+> Thus, the optimal $a^*$ corresponding the largest eigenvalue of $\mathbf{B}^*$, that is  $v_{1}^*$. And $a$ given by the largest eigenvalue of $\mathbf{W}^{-1}\mathbf{B}$. Similarly one can find the next direction $v_{2}^*$, and so on. $v_{\ell}=\mathbf{W}^{-\frac{1}{2}}v_{\ell}^*$.
+>  It is not hard to show (Exercise 4.1) that the optimal $a_1$ is identical to $v_1$ defined above. 
+
+The $a_{\ell}$ are referred to as discriminant coordinates, not to be confused with discriminant functions. They are also referred to as *canonical variates*, since an alternative derivation of these results is through a canonical correlation analysis of the indicator response matrix $\mathbf{Y}$ on the predictor matrix $\mathbf{X}$. This line is pursued in Section 12.5.
+
+To summarize the developments so far:
+  - Gaussian classification with common covariances leads to linear deci- sion boundaries. Classification can be achieved by sphering the data with respect to $\mathbf{W}$, and classifying to the closest centroid (modulo $\log\pi_k$) in the sphered space.
+  - Since only the relative distances to the centroids count, one can confine the data to the subspace spanned by the centroids in the sphered space.
+  - This subspace can be further decomposed into successively optimal subspaces in term of centroid separation. This decomposition is identical to the decomposition due to Fisher.
+
+One can show that this is a Gaussian classification rule with the additional restriction that the centroids of the Gaussians lie in a $L$-dimensional subspace of $\mathbb{R}^p$. Fitting such a model by maximum likelihood, and then constructing the posterior probabilities using Bayes’ theorem amounts to the classification rule described above (Exercise 4.8).
+> Exercise 4.8
+
+Gaussian classification dictates the logπk correction factor in the dis- tance calculation. The reason for this correction can be seen in Figure 4.9. The misclassification rate is based on the area of overlap between the two densities. If the $\pi_k$ are equal (implicit in that figure), then the optimal cut-point is midway between the projected means. If the $\pi_k$ are not equal, moving the cut-point toward the smaller class will improve the error rate. As mentioned earlier for two classes, one can derive the linear rule using LDA (or any other method), and then choose the cut-point to minimize misclassification error over the training data.
+
+Figure 4.10 shows the results. Figure 4.11 shows the decision boundaries for the classifier based on the two-dimensional LDA solution.
+
+<div align=center>
+<img src="pic/figure4.10.png" width="61.8%">
+</div>
+
+<div align=center>
+<img src="pic/figure4.11.png" width="61.8%">
+</div>
+
+There is a close connection between Fisher’s reduced rank discriminant analysis and regression of an indicator response matrix. It turns out that LDA amounts to the regression followed by an eigen-decomposition of $\hat{\mathbf{Y}}^T\mathbf{Y}$.  In the case of two classes, there is a single discriminant variable that is identical up to a scalar multiplication to either of the columns of $\hat{\mathbf{Y}}$. These connections are developed in Chapter 12. A related fact is that if one transforms the original predictors $\mathbf{X}$ to $\hat{\mathbf{Y}}$ , then LDA using $\hat{\mathbf{Y}}$ is identical to LDA in the original space (Exercise 4.3).
+> Exercise 4.3.
+
+## **4.4 Logistic Regression**
