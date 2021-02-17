@@ -287,3 +287,86 @@ There is a close connection between Fisher’s reduced rank discriminant analysi
 > Exercise 4.3.
 
 ## **4.4 Logistic Regression**
+
+The logistic regression model arises from the desire to model the posterior probabilities of the $K$ classes via linear functions in $x$, while at the same time ensuring that they sum to one and remain in $[0,1]$.
+ $$\tag{4.18}
+  \begin{aligned}
+    \Pr(G=k|X=x) &= \frac{\exp(\beta_{k0}+\beta_k^Tx)}{1+\sum_{\ell=1}^{K-1}\exp(\beta_{\ell 0}+\beta_{\ell}^Tx)}, k = 1,..., K-1\\
+     \Pr(G=K|X=x) &= \frac{1}{1+\sum_{\ell=1}^{K-1}\exp(\beta_{\ell 0}+\beta_{\ell}^Tx)}.
+  \end{aligned}
+$$
+The entire parameter set $\theta=\{\beta_{10}, \beta_1^T,..., \beta_{(K-1)0}, \beta^T_{K-1}\}$, we denote the probabilities $\Pr(G=k|X=x)=p_k(x;\theta)$.
+
+### **4.4.1 Fitting Logistic Regression Models**
+
+Logistic regression models are usually fit by maximum likelihood, using the conditional likelihood of $G$ given $X$.  Since $\Pr(G|X)$ completely specifies the conditional distribution, the multinomial distribution is appropriate. The log-likelihood for $N$ observations is
+$$\tag{4.19}
+\ell(\theta) = \sum_{i=1}^N\log p_{g_i}(x_i;\theta).
+$$
+
+In the two-class case, via a $0/1$ response $y_i$, the log-likelihood can be written
+$$\tag{4.20}
+\ell(\beta) = \sum_{i=1}^N\{y_i\log p(x_i;\beta)+(1-y_i)\log(1-p(x_i;\beta))\}
+$$
+we assume that the vector of inputs $x_i$ includes the constant term 1 to accommodate the intercept.
+
+Let $\mathbf{X}$ be the $N\times (p+1)$ matrix of $x_i$ values, $\mathbf{p}$ the vector of fitted probabilities with $i$th element $p(x_i;\beta^{\text{old}})$ and $\mathbf{W}$ a $N\times N$ diagonal matrix of weights with $i$th diagonal element $p(x_i;\beta^{\text{old}})(1-p(x_i;\beta^{\text{old}}))$. Then we have
+$$\tag{4.24}
+\frac{\partial \ell(\beta)}{\beta} = \mathbf{X}^T(\mathbf{y}-\mathbf{p})
+$$
+$$\tag{4.25}
+\frac{\partial^2 \ell(\beta)}{\beta\beta^T} = -\mathbf{X}^T\mathbf{W}\mathbf{X}.
+$$
+The Newton step is thus
+$$\tag{4.26}
+\begin{aligned}
+\beta^{\text{new}} &= \beta^{\text{old}} + (\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}\mathbf{X}^T(\mathbf{y}-\mathbf{p})\\
+&= (\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}\mathbf{X}^T\mathbf{W}(\mathbf{X}\beta^{\text{old}}+\mathbf{W}^{-1}(\mathbf{y}-\mathbf{p}))\\
+&=(\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}\mathbf{X}^T\mathbf{W}\mathbf{z}.
+\end{aligned}
+$$
+since at each iteration $\mathbf{p}$ changes, and hence so does $\mathbf{W}$ and $\mathbf{z}$.In the second and third line we have re-expressed the Newton step as a weighted least squares step, with the response
+$$\tag{4.27}
+\mathbf{z}=\mathbf{X}\beta^{\text{old}}+\mathbf{W}^{-1}(\mathbf{y}-\mathbf{p}).
+$$
+This algorithm is referred to as *iteratively reweighted least squares* or IRLS, since each iteration solves the weighted least squares problem:
+$$\tag{4.28}
+\beta^{\text{new}} \leftarrow \argmin_{\beta}(\mathbf{z}-\mathbf{X}\beta)^T\mathbf{W}(\mathbf{z}-\mathbf{X}\beta).
+$$
+It seems that $\beta = 0$ is a good starting value for the iterative procedure, although convergence is never guaranteed. Typically the algorithm does converge, since the log-likelihood is concave, but overshooting can occur. In the rare cases that the log-likelihood decreases, step size halving will guarantee convergence.
+
+For the multiclass case $(K \geq 3)$ the Newton algorithm can also be expressed as an iteratively reweighted least squares algorithm, but with a vector of $K−1$ responses and a nondiagonal weight matrix per observation. The latter precludes any simplified algorithms, and in this case it is numerically more convenient to work with the expanded vector $θ$ directly (Exercise 4.4). 
+> Exercise 4.4.
+
+Alternatively coordinate-descent methods (Section 3.8.6) can be used to maximize the log-likelihood efficiently. 
+
+Logistic regression models are used mostly as a data analysis and inference tool, where the goal is to understand the role of the input variables. in explaining the outcome. Typically many models are fit in a search for a parsimonious model involving a subset of the variables, possibly with some interactions terms. The following example illustrates some of the issues involved.
+- Example: South African Heart Disease
+
+### **4.4.3 Quadratic Approximations and Inference**
+
+The maximum-likelihood parameter estimates $\hat{\beta}$ satisfy a self-consistency relationship: they are the coefficients of a weighted least squares fit, where the responses are
+$$\tag{4.29}
+z_i = x_i^T\hat{\beta}+\frac{(y_i-\hat{p}_i)}{\hat{p}_i(1-\hat{p}_i)},
+$$
+and the weights are $w_i=\hat{p}_i(1-\hat{p}_i)$, both depending on $\hat{\beta}$ itself. Apart from providing a convenient algorithm, this connection with least squares has more to offer:
+  - The weighted residual sum-of-squares is the familiar Pearson chi-square statistic
+ $$\tag{4.30}
+\sum_{i=1}^N\frac{(y_i-\hat{p}_i)^2}{\hat{p}_i(1-\hat{p}_i)},
+ $$
+ a quadratic approximation to the deviance.
+ - Asymptotic likelihood theory says that if the model is correct, then $\hat{\beta}$ is consistent (i.e., converges to the true $\beta$).
+ - A central limit theorem then shows that the distribution of $\hat{\beta}$ converges to $N(\beta,(\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1})$. This and other asymptotics can be derived directly from the weighted least squares fit by mimicking normal theory inference.
+   > For the weighted least squares, the estimated parameter values are linear combinations of the observed values
+   > $$\hat{\beta} = (\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}\mathbf{X}^T\mathbf{W}\mathbf{y}.
+   > $$
+   > Therefore, an expression for the estimated variance-covariance matrix of the parameter estimates can be obtained by error propagation from the errors in the observations. Let the variance-covariance matrix for the observations be denoted by $\mathbf{M}$ and that of the estimated parameters by $\mathbf{M}^{\beta}$. Then
+   > $$
+   \mathbf{M}^{\beta} = (\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}\mathbf{X}^T\mathbf{W}\mathbf{M}\mathbf{W}^T\mathbf{X}(\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}.
+   > $$
+   > when $\mathbf{W}=\mathbf{M}^{-1}$, this simplifies to 
+   > $$ \mathbf{M}^{\beta} = (\mathbf{X}^T\mathbf{W}\mathbf{X})^{-1}.
+   > $$
+   > When unit weights are used ($\mathbf{W} = \mathbf{I}$, the identity matrix), it is implied that the experimental errors are uncorrelated and all equal: $\mathbf{M} = \sigma^2\mathbf{I}$, where $\sigma^2$ is the a priori variance of an observation. 
+ - Model building can be costly for logistic regression models, because each model fitted requires iteration. Popular shortcuts are the *Rao score test* which tests for inclusion of a term, and the *Wald test* which can be used to test for exclusion of a term. Neither of these require iterative fitting, and are based on the maximum-likelihood fit of the current model. It turns out that both of these amount to adding or dropping a term from the weighted least squares fit, using the same weights. Such computations can be done efficiently, without recomputing the entire weighted least squares fit.
+ - GLM (generalized linear model) objects can be treated as linear model objects, and all the tools available for linear models can be applied automatically.
