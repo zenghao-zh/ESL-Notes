@@ -766,4 +766,4 @@ The same kind of algorithm can be applied to the elastic net, the grouped lasso 
 
 ## **Computational Considerations**
 
-Cholesky decomposition of the matrix $\mathbf{X}^T\mathbf{X}$ ($p^3+Np^2/2$) or a QR decomposition of $\mathbf{X}$ (Np^2). Depending on the relative size of $N$ and $p$, the Cholesky can sometimes be faster; on the other hand, it can be less numerically stable (Lawson and Hansen, 1974).  Computation of the lasso via the LAR algorithm has the same order of computation as a least squares fit.
+Cholesky decomposition of the matrix $\mathbf{X}^T\mathbf{X}$ ($p^3+Np^2/2$) or a QR decomposition of $\mathbf{X} (Np^2)$. Depending on the relative size of $N$ and $p$, the Cholesky can sometimes be faster; on the other hand, it can be less numerically stable (Lawson and Hansen, 1974).  Computation of the lasso via the LAR algorithm has the same order of computation as a least squares fit.
