@@ -310,7 +310,7 @@ $$\tag{4.20}
 $$
 we assume that the vector of inputs $x_i$ includes the constant term 1 to accommodate the intercept.
 
-Let $\mathbf{X}$ be the $N\times (p+1)$ matrix of $x_i$ values, $\mathbf{p}$ the vector of fitted probabilities with $i$th element $p(x_i;\beta^{\text{old}})$ and $\mathbf{W}$ a $N\times N$ diagonal matrix of weights with $i$th diagonal element $p(x_i;\beta^{\text{old}})(1-p(x_i;\beta^{\text{old}}))$. Then we have
+Let $\mathbf{X}$ be the $N\times (p+1)$ matrix of $x_i$ values, $\mathbf{p}$ the vector of fitted probabilities with $i$th element $p(x_i;\beta^{\text{old}})$ and $\mathbf{W}$ a $N\times N$ diagonal matrix of weights with $i$th diagonal element $p(x_i;\beta^{\text{old}})(1-p(x_i;\beta^{\text{old}}))$. Then we have the score equation
 $$\tag{4.24}
 \frac{\partial \ell(\beta)}{\beta} = \mathbf{X}^T(\mathbf{y}-\mathbf{p})
 $$
@@ -370,3 +370,72 @@ and the weights are $w_i=\hat{p}_i(1-\hat{p}_i)$, both depending on $\hat{\beta}
    > When unit weights are used ($\mathbf{W} = \mathbf{I}$, the identity matrix), it is implied that the experimental errors are uncorrelated and all equal: $\mathbf{M} = \sigma^2\mathbf{I}$, where $\sigma^2$ is the a priori variance of an observation. 
  - Model building can be costly for logistic regression models, because each model fitted requires iteration. Popular shortcuts are the *Rao score test* which tests for inclusion of a term, and the *Wald test* which can be used to test for exclusion of a term. Neither of these require iterative fitting, and are based on the maximum-likelihood fit of the current model. It turns out that both of these amount to adding or dropping a term from the weighted least squares fit, using the same weights. Such computations can be done efficiently, without recomputing the entire weighted least squares fit.
  - GLM (generalized linear model) objects can be treated as linear model objects, and all the tools available for linear models can be applied automatically.
+
+### **4.4.4 $L_1$ Regularized Logistic Regression**
+
+For logistic regression, we would maximize a penalized version of $(4.20)$
+$$\tag{4.31}
+\min \bigg\{\sum_{i=1}^N\{y_i\log p(x_i;\beta)+(1-y_i)\log(1-p(x_i;\beta))+\lambda\sum_{j=1}^p|\beta_j|\bigg\}.
+$$
+The score equations [see (4.24)] for the variables with non-zero coefficients have the form
+$$\tag{4.32}
+\mathbf{x}_j^T(\mathbf{y}-\mathbf{p}) = \lambda \cdot\text{sign}(\beta_j),
+$$
+which generalizes (3.58) in Section 3.4.4; the active variables are tied in their *generalized* correlation with the residuals. Path algorithms such as LAR for lasso are more difficult, because thecoefficient profiles are piecewise smooth rather than linear. Nevertheless, progress can be made using quadratic approximations.
+
+Figure 4.13 shows the L 1 regularization path for the South African heart disease data of Section 4.4.2.
+
+<div align=center>
+<img src="pic/figure4.13.png" width="61.8%">
+</div>
+
+Coordinate descent methods (Section 3.8.6) are very efficient for computing the coefficient profiles on a grid of values for $\lambda$.
+
+### **4.4.5 Logistic Regression or LDA?**
+
+In Sectio 4.3, we find that the log-posterior odds between class $k$ and $K$ are linear function of $x$ (4.9):
+$$\tag{4.33}
+\begin{aligned}
+\log \frac{\Pr(G=k|X=x)}{\Pr(G=K|X=x)}
+&=\log\frac{\pi_k}{\pi_{K}}-\frac{1}{2}(\mu_k+\mu_{K})^T\Sigma^{-1}(\mu_k-\mu_{K})+x^T\Sigma^{-1}(\mu_k-\mu_{K})\\
+&= \alpha_{k0}+\alpha_{k}^Tx.
+\end{aligned}
+$$
+This linearity is a consequence of the Gaussian assumption for the class densities, as well as the assumption of a common covariance matrix. The linear logistic model (4.17) by construction has linear logits:
+$$\tag{4.34}
+\log\frac{\Pr(G=k|X=x)}{\Pr(G=K|X=x)} = \beta_{k0}+\beta^kx.
+$$
+
+It seems that the models are the same. Although they have exactly the same form, the difference lies in the way the linear coefficients are estimated. The logistic regression model is more general, in that it makes less assumptions.
+We can write the *joint density* of $X$ and $G$ as
+$$\tag{4.35}
+\Pr(X,G=k) = \Pr(X)\Pr(G=k|X),
+$$
+where $\Pr(X)$ denotes the marginal density of the inputs $X$. For both LDA and logistic regression,  the second term on the right has the logit-linear form
+$$\tag{4.36}
+\Pr(G=k|X=x) = \frac{e^{\beta_{k0}+\beta_k^Tx}}{1+\sum_{\ell=1}^{K-1}e^{\beta_{\ell0}+\beta_{\ell}^Tx}},
+$$
+where we have again arbitrarily chosen the last class as the reference. The logistic regression model leaves the marginal density of X as an arbitrary density function $\Pr(X)$, and fits the parameters of $\Pr(G|X)$ by maximizing the conditional likelihood—the multinomial likelihood with probabilities the $\Pr(G = k|X)$. Although $\Pr(X)$ is totally ignored, we can thinkof this marginal density as being estimated in a fully nonparametric and unrestricted fashion, using the empirical distribution function which places mass $1/N$ at each observation.
+
+With LDA we fit the parameters by maximizing the full log-likelihood based on the joint density 
+$$\tag{4.37}
+\Pr(X,G=k) = \phi(X;\mu_k,\Sigma)\pi_k,
+$$
+where $\phi$ is the Gaussian density function. Since the linear parameters of the logistic form (4.33) are functions of the Gaussian parameters, we get their maximum-likelihood estimates by plugging in the corresponding estimates. However, unlike in the conditional case, the marginal density Pr(X) does play a role here. It is a mixture density
+$$\tag{4.38}
+\Pr(X) = \sum_{k=1}^K \pi_k\phi(X;\mu_k,\Sigma),
+$$
+which also involvs the parameters.
+
+**The additional model assumption:** By relying on the additional model assumptions, we have more information about the parameters, and hence can estimate them more efficiently (lower variance). If in fact the true $f_k(x)$ are Gaussian, then in the worst case ignoring this marginal part of the likelihood constitutes a loss of efficiency of about 30\% asymptotically in the error rate (Efron, 1975). Paraphrasing: with 30\% more data, the conditional likelihood will do as well.
+
+For example, observations far from the decision boundary (which are **down-weighted** by logistic regression) play a role in estimating the common covariance matrix. This is not all good news, **because it also means that LDA is not robust to gross outliers.**
+
+From the mixture formalution, unlabeled observation have information about parameters.
+
+**The marginal likelihood can be thought of as a regularizer**, requiring in some sense that class densities be visible from this marginal view. For example, if the data in a two-class logistic regression model can be perfectly separated by a hyperplane, the maximum likelihood estimates of the parameters are undefined (i.e., infinite; see Exercise 4.5). The LDA coefficients for the same data will be well defined, since the marginal likelihood will not permit these degeneracies.
+> Exercise 4.5.
+
+In practice these assumptions are never correct, and often some of the components of $X$ are qualitative variables. It is generally felt that logistic regression is a safer, more robust bet than the LDA model, relying on fewer assumptions. It is our experience that the models give very similar results, even when LDA is used inappropriately, such as with qualitative predictors.
+
+## **4.5 Separating Hyperplanes**
