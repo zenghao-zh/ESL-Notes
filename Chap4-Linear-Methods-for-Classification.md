@@ -439,3 +439,138 @@ From the mixture formalution, unlabeled observation have information about param
 In practice these assumptions are never correct, and often some of the components of $X$ are qualitative variables. It is generally felt that logistic regression is a safer, more robust bet than the LDA model, relying on fewer assumptions. It is our experience that the models give very similar results, even when LDA is used inappropriately, such as with qualitative predictors.
 
 ## **4.5 Separating Hyperplanes**
+
+Separating hyperplane classifiers procedures construct linear decision boundaries that explicitly try to separate the data into different classes as well as possible. They provide the basis for support vector classifiers, discussed in Chapter 12.
+
+Figure 4.14 shows 20 data points in two classes in $\mathbb{R}^2$. 
+<div align=center>
+<img src="pic/figure4.14.png" width="61.8%">
+</div>
+
+The orange line is the least squares solution to the problem, obtained by regressing the $-1/1$ response $Y$ and $X$ (with intercept); the line is given by
+$$\tag{4.39}
+\{x:\hat{\beta}_0+\hat{\beta}_1x_1+\hat{\beta}_2x_2=0\}.
+$$
+
+This least squares solution does not do a perfect job in separating the points, and makes one error. This is the same boundary found by LDA, in light of its equivalence with linear regression in the two-class case (Section 4.3 and Exercise 4.2).
+
+Classifiers such as (4.39), that compute a linear combination of the input features and return the sign, were called *perceptrons* in the engineering literature in the late 1950s.
+
+Before we continue, let us digress slightly and review some vector algebra. Figure 4.15 depicts a hyperplane or *affine set* $L$ defined by the equation $f(x)=\beta_0+\beta^Tx=0$; since we are in $\mathbb{R}^2$ this is a line.
+
+Here we list some properties:
+
+1. For any two points $x_1$ and $x_2$ lying in $L$, $\beta^T(x_1-x_2)=0$, and hence $\beta^*=\beta/\|\beta\|$ is the vector normal to the surface of $L$.
+2. For any point $x_0$ in $L$, $\beta^Tx_0=-\beta_0$.
+3. The signed distance of any point $x$ to $L$ is given by
+$$\tag{4.40}
+\beta^{*T}(x-x_0) = \frac{1}{\|\beta\|}(\beta^Tx+\beta_0) = \frac{1}{\|f'(x)\|}f(x).
+$$
+Hence $f(x)$ is proportional to the signed distance from $x$ to the hyperplane defined by $f(x)=0$.
+
+<div align=center>
+<img src="pic/figure4.15.png" width="61.8%">
+</div>
+
+## **4.5.1 Rosenblatt’s Perceptron Learning Algorithm**
+
+The perceptron learning algorithm tries to find a separating hyperplane by minimizing the distance of misclassified points to the decision boundary. If a response $y_i=1$ is misclassified, then $x_i^T\beta+\beta_0 < 0$, and the opposite for a misclassified response with $y_i=-1$. The goal is to minimize
+$$\tag{4.41}
+D(\beta,\beta_0) = -\sum_{i\in \mathcal{M}} y_i(x_i^T\beta+\beta_0),
+$$
+where $\mathcal{M}$ indexes the set of misclassified points. The quantity is non-negative and proportional to the distance of the misclassified points to the decision boundary defined by $\beta^Tx+\beta_0=0$. The gradient (assuming $\mathcal{M}$ is fixed) is given by
+$$\tag{4.42}
+\frac{\partial D(\beta, \beta_0)}{\partial \beta} = -\sum_{i\in \mathcal{M}}y_ix_i,
+$$
+$$\tag{4.43}
+\frac{\partial D(\beta, \beta_0)}{\partial \beta_0} = -\sum_{i\in \mathcal{M}}y_i.
+$$
+The algorithm in fact uses *stochastic gradient descent* to minimize this piecewise linear criterion. Hence the misclassified observations are visited in some sequence, and the parameters $\beta$ are updated via
+$$\tag{4.44}
+\begin{pmatrix}
+\beta \\
+\beta_0
+\end{pmatrix} \leftarrow \begin{pmatrix}
+\beta \\
+\beta_0
+\end{pmatrix} + \rho \begin{pmatrix}
+y_ix_i \\
+y_i
+\end{pmatrix}.
+$$
+Here $\rho$ is the learning rate, which in this case can be taken to be 1 without loss in generality. If the classes are linearly separable, it can be shown that the algorithm converges to a separating hyperplane in a finite number of steps (Exercise 4.6).
+> Exercise 4.6
+
+Figure 4.14 shows two solutions to a toy problem, each started at a different random guess.
+
+There are a number of problems with this algorithm, summarized in Ripley (1996):
+- When the data are separable, there are many solutions, and which one is found depends on the starting values.
+- The “finite” number of steps can be very large. The smaller the gap, the longer the time to find it.
+- When the data are not separable, the algorithm will not converge, and cycles develop. The cycles can be long and therefore hard to detect.
+
+The second problem can often be eliminated by seeking a hyperplane not in the original space, but in a much enlarged space obtained by creating many basis-function transformations of the original variables. This is analogous to driving the residuals in a polynomial regression problem down to zero by making the degree sufficiently large. Perfect separation cannot always be achieved: for example, if observations from two different classes share the same input. It may not be desirable either, since the resulting model is likely to be overfit and will not generalize well. We return to this point at the end of the next section.
+
+A rather elegant solution to the first problem is to add additional constraints to the separating hyperplane.
+
+### **4.5.2 Optimal Separating Hyperplanes 🤔**
+
+The *optimal separating hyperplane* separates the two classes by maximizing the margin between the two classes on the training data. We need to generalize criterion (4.41). Considering the optimization problem
+$$\tag{4.45}
+\max_{\beta,\beta_0, \|\beta\|=1} M\\
+\text{subject to } y_i(x_i^T\beta+\beta_0) \geq M, i=1,...,N.
+$$
+We can get rid of the $\|\beta\|=1$ constraint by replacing the condition with
+$$\tag{4.46}
+\frac{1}{\|\beta\|}y_i(x_i^T\beta+\beta_0) \geq M, 
+$$
+or equivalently
+$$\tag{4.47}
+y_i(x_i^T\beta+\beta_0) \geq M\|\beta\|.
+$$
+Since for any $\beta$ and $\beta_0$ satisfying these inequalities, any positively scaled multiple satisfies them too, we can arbitrarily set $\|\beta\|=1/M$. Thus (4.45) is equivalent to 
+$$\tag{4.48}
+\min_{\beta,\beta_0} \frac{1}{2}\|\beta\|^2\\
+\text{subject to }y_i(x_i^T\beta+\beta_0)\geq 1, i=1,...,N.
+$$
+In light of (4.40), the constraints define an empty slab or margin around the linear decision boundary of thickness $1/\|\beta\|$. Hence we choose $\beta$ and $\beta_0$ to maximize its thickness. This is a convex optimization problem, and the Lagrange function, to be minimized w.r.t $\beta$ and $\beta_0$, is 
+$$\tag{4.49}
+L_P=\frac{1}{2}\|\beta\|^2-\sum_{i=1}^N\alpha_i[y_i(x_i^T\beta+\beta_0)-1].
+$$
+Setting the derivatives to zero, we obtain:
+$$\tag{4.50}
+\begin{aligned}
+\beta &= \sum_{i=1}^N\alpha_iy_ix_i,\\
+0 &= \sum_{i=1}^N \alpha_iy_i
+\end{aligned}
+$$
+and substituting these in (4.49) we obtain the so-called Wolfe dual
+$$\tag{4.51}
+L_D = \sum_{i=1}^N \alpha_i-\frac{1}{2}\sum_{i=1}^N\sum_{k=1}^N \alpha_i\alpha_ky_iy_kx_i^Tx_k\\
+\text{subject to } \alpha_i\geq 0 \text{ and } \sum_{i=1}^N\alpha_iy_i = 0. 
+$$
+The solution is obtained by maximizing L D in the positive orthant, a simpler convex optimization problem, for which standard software can be used. In addition the solution must satisfy the Karush–Kuhn–Tucker conditions, which include (4.50), (4.51), (4.52) and
+$$ \alpha_i[y_i(x^T_i\beta + \beta_0 ) − 1] = 0 \quad \forall i.$$
+
+From these we can see that
+- if $\alpha_i > 0$, then $y_i(x^T_i\beta + \beta_0 )=1$, or in other words, $x_i$ is on the boundary of the slab;
+- if $y_i(x^T_i\beta + \beta_0)>1$, $x_i$ is not on the boundary of the slab, and $a_i=0$.
+
+From (4.50) we see that the solution vector $\beta$ is defined in terms of a linear combination of the support points $x_i$ —— those points defined to be on the boundary of the slab via $\alpha_i > 0$. Figure 4.16 shows the optimal separating hyperplane for our toy example; there are three support points. Likewise, $\beta$ is obtained by solving (4.53) for any of the support points.
+
+The optimal separating hyperplane produces a function $\hat{f}(x) = x^T \hat{\beta}+ \hat{\beta}_0$ for classifying new observations:
+$$\tag{4.54}
+\hat{G}(x) = \text{sign}\hat{f}(x).
+$$
+
+<div align=center>
+<img src="pic/figure4.16.png" width="61.8%">
+</div>
+
+Although none of the training observations fall in the margin (by construction), this will not necessarily be the case for test observations. The intuition is that a large margin on the training data will lead to good separation on the test data.
+
+**Relation to LDA:** The description of the solution in terms of support points seems to suggest that the optimal hyperplane focuses more on the points that count, and is more robust to model misspecification. The LDA solution, on the other hand, depends on all of the data, even points far away from the decision boundary. Note, however, that the identification of these support points required the use of all the data. Of course, if the classes are really Gaussian, then LDA is optimal, and separating hyperplanes will pay a price for focusing on the (noisier) data at the boundaries of the classes.
+
+**Relation to logistic regression** When a separating hyperplane exists, logistic regression will always find it, since the log-likelihood can be driven to 0 in this case (Exercise 4.5). The logistic regression solution shares some other qualitative features with the separating hyperplane solution. The coefficient vector is defined by a weighted least squares fit of a zero-mean linearized response on the input features, and the weights are larger for points near the decision boundary than for those further away.
+> Exercise 4.5.
+
+When the data are not separable, there will be no feasible solution to this problem, and an alternative formulation is needed. Again one can enlarge the space using basis transformations, but this can lead to artificial separation through over-fitting. In Chapter 12 we discuss a more attractive alternative known as the support vector machine, which allows for overlap, but minimizes a measure of the extent of this overlap.
